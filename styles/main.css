@@ -7,7 +7,6 @@ nav {
     padding-right: 0%;
     padding-top: 20pt;
     position: fixed;
-    /* margin-top: 7%; */
 }
 
 nav ul {
@@ -24,15 +23,11 @@ div {
     width: 75%;
     padding-left: 5%;
     padding-right: 5%;
-    /* margin-top: 7%; */
 }
 
 header{
     top: 0;
     width: 100%;
-    /* background-color: white; */
-    /* position: fixed; */
-    /* margin-bottom: 5%; */
 }
 
 .index_div{
@@ -43,6 +38,15 @@ header{
     margin-top: 0%;
 }
 
-/* #bio {
-    margin-top: 7%;
-} */
+figure {
+    padding: 4px;
+    margin: 0;
+}
+  
+figcaption {
+    color:gray;
+    font-style: italic;
+    padding: 2px;
+    text-align: left;
+    font-size:x-small;
+}
