@@ -1,0 +1,60 @@
+nav {
+    float: left;
+    display: block;
+    border: black, 1pt, solid;
+    width: 15%;
+    padding-left: 0%;
+    padding-right: 0%;
+    padding-top: 20pt;
+    position: fixed;
+}
+
+nav ul {
+    padding-left:5%;
+    margin-top: 0%;
+}
+
+nav li{
+    padding: 3%;
+}
+
+div {
+    float: right;
+    width: 75%;
+    padding-left: 5%;
+    padding-right: 5%;
+}
+
+header{
+    top: 0;
+    width: 100%;
+}
+
+div p {
+    float: left;
+    width: 60%;
+}
+
+h5 {
+    margin: 0;
+    padding: 0;
+}
+
+div figure {
+    width: 30%;
+    float: right;
+    padding: 4px;
+    margin: 0;
+}
+
+div figure img {
+    width: 400px;
+}
+  
+figcaption {
+    color:gray;
+    font-style: italic;
+    padding: 2px;
+    text-align: left;
+    font-size:small;
+}
