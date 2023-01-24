@@ -25,6 +25,11 @@ div {
     padding-right: 5%;
 }
 
+div h2 {
+    padding-top: 20px;
+    border-top: 1px solid grey;
+}
+
 header{
     top: 0;
     width: 100%;
