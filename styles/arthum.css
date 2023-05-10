@@ -63,7 +63,7 @@ figcaption {
     font-size:small;
 }
 
-table, th, td {
+#midterm table, th, td {
     border: 1px solid black;
     border-collapse: collapse;
     border-spacing: 1px;
@@ -71,10 +71,26 @@ table, th, td {
     padding: 2px;
 }
 
-tr:nth-child(odd) {
+#midterm tr:nth-child(odd) {
     background-color:lightyellow;
 }
 
-th {
+#midterm th {
     background-color: yellow;
+}
+
+#final table, th, td {
+    border: 1px solid black;
+    border-collapse: collapse;
+    border-spacing: 1px;
+    text-align: left;
+    padding: 2px;
+}
+
+#final tr:nth-child(odd) {
+    background-color: lightblue;
+}
+
+#final th {
+    background-color:cornflowerblue;
 }
