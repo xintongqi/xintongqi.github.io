@@ -50,3 +50,19 @@ figcaption {
     text-align: left;
     font-size:x-small;
 }
+
+table, th, td {
+    border: 1px solid black;
+    border-collapse: collapse;
+    border-spacing: 1px;
+    text-align: left;
+    padding: 2px;
+}
+
+tr:nth-child(odd) {
+    background-color:lightyellow;
+}
+
+th {
+    background-color: yellow;
+}

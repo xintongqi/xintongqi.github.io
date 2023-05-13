@@ -1,0 +1,88 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>C#</title>
+    <link rel="stylesheet" href="../styles/main.css">
+    <link href="../styles/print.css" media="print" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.7.0/build/styles/default.min.css">
+    <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.7.0/build/highlight.min.js"></script>
+    <script>hljs.highlightAll();</script>
+</script>
+</head>
+<body>
+    <header>
+        <h1>Learn C#</h1>
+    </header>
+    
+    <nav>
+        <p><b>Learn C#</b></p>
+        <a href="../index.html">Back to landing page</a>
+        <ul>
+            <li><a href="#basis">Basis</a></li>
+            <li><a href="#env">Environment</a></li>
+            <li><a href="#functions">Functions</a></li>
+        </ul>
+    </nav>
+
+    <div id="basis">
+        <h2>Basis</h2>
+        <ul>
+            <li>case sensitive</li>
+            <li>end statement with semicolon</li>
+            <li>data types
+                <pre><code class="language-csharp">
+                        char c = 'c';
+                        int i = 123;
+                        decimal d = 1.23m; 
+                        // float: 32 bit, double: 64 bit, decimal: 128 bit
+                        // by default it's double, have to use suffix f for float and m for decimal
+                        string s = "hello";
+                        bool b = true;
+                </code></pre>
+                can also declare variables implicitly with <code>var</code>, but data type is fixed once you declare it. <br>
+                Type conversions: <br>
+                <code>int</code> is converted into <code>string</code> in concats. <br>
+                for numeric values: cast explicitly, use either brackets or corresponding suffices <br>
+                compound assignment <code>++, +=</code> allowed; note pre/post increment/decrement <br>
+                <pre><code class="language-csharp">
+                        // this line prints Windows 74 instead of Windows 11
+                        Console.WriteLine("Windows " + 7 + 4);
+                    </code></pre>
+            </li>
+        </ul>
+    </div>
+
+    <div id="env">
+        <h2>Environment</h2>
+        <ul>
+            <li>access through vscode: build, run, etc.</li>
+            <li>access through terminal: <code>dotnet build</code> and <code>dotnet run</code></li>
+        </ul>
+    </div>
+    
+    <div id="functions">
+        <h2>Functions</h2>
+        <!-- <table>
+            <tr>
+                <th style="width: 15%;">I/O</th>
+                <th style="width: 15%;">...</th>
+                <th style="width: 15%;">...</th>
+                <th>...</th>
+              </tr>
+        </table> -->
+        <h4>I/O</h4>
+        <ul>
+            <li>
+                <code>Console.WriteLine()</code> and <code>Console.Write()</code>: work for int, decimal, string, char... <br>
+                verbatim string literal: <code>@"    some string"</code> works pretty much like <code>&ltpre&gt</code> in html, note that it ignores special characters such as <code>\n</code> within the string <br>
+                string interpolation: <code>string message = $"Hello {firstName}!";</code> <br>
+                combine verbatim string literal and string interpolation: <code>$@" sth {sth}"</code> <br>
+                tabs <code>\t</code> align the text at a multple of 4 spaces
+            </li>
+            <li></li>
+        </ul>
+    </div>
+</body>
+</html>
