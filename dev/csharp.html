@@ -20,11 +20,19 @@
         <p><b>Learn C#</b></p>
         <a href="../index.html">Back to landing page</a>
         <ul>
-            <li><a href="#basis">Basis</a></li>
             <li><a href="#env">Environment</a></li>
+            <li><a href="#basis">Basis</a></li>
             <li><a href="#functions">Functions</a></li>
         </ul>
     </nav>
+
+    <div id="env">
+        <h2>Environment</h2>
+        <ul>
+            <li>access through vscode: build, run, etc.</li>
+            <li>access through terminal: <code>dotnet build</code> and <code>dotnet run</code></li>
+        </ul>
+    </div>
 
     <div id="basis">
         <h2>Basis</h2>
@@ -42,7 +50,7 @@
                         bool b = true;
                 </code></pre>
                 can also declare variables implicitly with <code>var</code>, but data type is fixed once you declare it. <br>
-                Type conversions: <br>
+                type conversions: <br>
                 <code>int</code> is converted into <code>string</code> in concats. <br>
                 for numeric values: cast explicitly, use either brackets or corresponding suffices <br>
                 compound assignment <code>++, +=</code> allowed; note pre/post increment/decrement <br>
@@ -51,14 +59,14 @@
                         Console.WriteLine("Windows " + 7 + 4);
                     </code></pre>
             </li>
-        </ul>
-    </div>
-
-    <div id="env">
-        <h2>Environment</h2>
-        <ul>
-            <li>access through vscode: build, run, etc.</li>
-            <li>access through terminal: <code>dotnet build</code> and <code>dotnet run</code></li>
+            <li>
+                stateful (instance) vs stateless methods (static): <br>
+                the former relies on memory, the latter does not, i.e., need to instantiate for stateful method but not need for stateless ones.
+            </li>
+            <li>
+                OOP <br>
+                similar to Java, instantiate through the <code>new</code> keyword. <br>
+            </li>
         </ul>
     </div>
     
