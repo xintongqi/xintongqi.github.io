@@ -20,10 +20,29 @@
         <p><b>Learn React</b></p>
         <a href="../index.html">Back to landing page</a>
         <ul>
-            <li></li>
+            <li><a href="#jsx">JSX</a></li>
         </ul>
     </nav>
 
+    <div id="jsx">
+        <h2>JSX</h2>
+        <ul>
+            <li>extended JS, cannot be rendered by browsers, must be compiled</li>
+            <li>idea is to treat html elements as variables in JS. those html pieces are called JSX elements <br>
+            If they span multiple lines, they have to be wrapped in parentheses.</li>
+            <li>a JSX expression must have exactly one outermost JSX element, usually just wrap everything with <code>&ltdiv&gt</code></li>
+            <li>render JSX
+                <pre><code>
+                    const container = document.getElementById('app');
+                    // createRoot is a function from React; specifies where to put the rendered element
+                    const root = createRoot(container);
+                    // render tells the root to render what is passed; specifies what to render
+                    root.render(&lth1&gtHello world&lt/h1&gt);
+                </code></pre>
+                <code>render()</code> only updates DOM elements that have changed when called multiple times
+            </li>
+        </ul>
+    </div>
 
     
     
