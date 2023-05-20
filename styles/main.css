@@ -70,3 +70,7 @@ th {
 code {
     background-color: rgb(243, 243, 243);
 }
+
+details{
+    padding-top: 10px;
+}

@@ -20,12 +20,67 @@
         <p><b>Learn JS</b></p>
         <a href="../index.html">Back to landing page</a>
         <ul>
-            <li></li>
+            <li><a href="#dom">DOM</a></li>
+            <li><a href="#basis">Basis</a></li>
+            <li><a href="#ds">Data Structures</a></li>
         </ul>
     </nav>
 
+    <div id="dom">
+        <h2>DOM</h2>
+        Just a quick recap on DOM: an API provided by browsers. Click on below to expand.<br>
+        <details>
+            <summary>components of a DOM</summary>
+            <li>document: the root element</li>
+            <li>node: basically every element in the tree</li>
+            <li>element: only html tags are counted as elements, i.e., node minus attributes, text, comments, etc.</li>
+            <li>nodeList: a list of nodes; access through <code>myList[index]</code> or <code>myList.item(index)</code></li>
+            <li>attributes: html attributes</li>
+            <li>namedNodeMap: a map with order</li>
+        </details>
+        
+        <details>
+            <summary>some key functions</summary>
+            <li><code>document.querySelector("selector")</code>: selector is a css selector; returns an object</li>
+            <li><code>document.querySelectorAll("selector")</code></li>
+            <li><code>document.createElement("name")</code>: name is an html element name</li>
+            <li><code>parentNode.appendChild(node)</code>: can nest <code>appendChild()</code> calls onto a single node</li>
+            <li><code>element.innerHTML</code> and <code>element.style</code></li>
+            <li><code>element.getAttribute("name")</code> and <code>element.setAttribute("name", value)</code></li>
+            <li><code>element.addEventListener("event type", listener...)</code>: listener is null or a function, there are more parameters in this function</li>
+        </details>
+    </div>
 
+    <div id="basis">
+        <h2>Basis</h2>
+        client-side JS: run on browsers, respond to user actions such as onclick <br>
+        server-side JS: run on servers, pretty much like Java servers
+        <h4>declaration</h4>
+        <ul>
+            <li><code>var</code>: local/global, initialization optional</li>
+            <li><code>let</code>: local, initialization optional</li>
+            <li><code>const</code>: local, must be initialized, read-only</li>
+        </ul>
+        <h4>data types</h4>
+        <pre><code>// strings, numbers, booleans
+let str1 = 'hello'; 
+let str2 = "hello";
+let num = 5.20;
+let success = true;
+
+// arrays: doesn't have to be same data type
+let names = ["Amy", 2023, "Bob", 4096, "Carly", true];
+
+// objects
+let header = document.querySelector('h1');</code></pre>
+        <h4>flow control</h4>
+        Never, ever use <code>==</code> in JS. Use <code>===</code> and <code>!==</code>.
+    </div>
     
+    <div id="ds">
+        <h2>Data Structures</h2>
+        <h4>collections</h4>
+    </div>
     
 </body>
 </html>
