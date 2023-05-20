@@ -66,3 +66,7 @@ tr:nth-child(odd) {
 th {
     background-color: yellow;
 }
+
+code {
+    background-color: rgb(243, 243, 243);
+}

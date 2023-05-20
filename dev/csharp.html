@@ -22,6 +22,7 @@
         <ul>
             <li><a href="#env">Environment</a></li>
             <li><a href="#basis">Basis</a></li>
+            <li><a href="#ds">Data Structures</a></li>
             <li><a href="#functions">Functions</a></li>
         </ul>
     </nav>
@@ -40,24 +41,20 @@
             <li>case sensitive</li>
             <li>end statement with semicolon</li>
             <li>data types
-                <pre><code class="language-csharp">
-                        char c = 'c';
-                        int i = 123;
-                        decimal d = 1.23m; 
-                        // float: 32 bit, double: 64 bit, decimal: 128 bit
-                        // by default it's double, have to use suffix f for float and m for decimal
-                        string s = "hello";
-                        bool b = true;
-                </code></pre>
+                <pre><code>char c = 'c';
+int i = 123;
+decimal d = 1.23m; 
+// float: 32 bit, double: 64 bit, decimal: 128 bit
+// by default it's double, use suffix f for float and m for decimal
+string s = "hello";
+bool b = true;</code></pre>
                 can also declare variables implicitly with <code>var</code>, but data type is fixed once you declare it. <br>
                 type conversions: <br>
                 <code>int</code> is converted into <code>string</code> in concats. <br>
                 for numeric values: cast explicitly, use either brackets or corresponding suffices <br>
                 compound assignment <code>++, +=</code> allowed; note pre/post increment/decrement <br>
-                <pre><code class="language-csharp">
-                        // this line prints Windows 74 instead of Windows 11
-                        Console.WriteLine("Windows " + 7 + 4);
-                    </code></pre>
+                <pre><code>// this line prints Windows 74 instead of Windows 11
+Console.WriteLine("Windows " + 7 + 4);</code></pre>
             </li>
             <li>
                 stateful (instance) vs stateless methods (static): <br>
@@ -67,7 +64,23 @@
                 OOP <br>
                 similar to Java, instantiate through the <code>new</code> keyword. <br>
             </li>
+            <li>
+                variable naming convention: <br>
+                should NOT use abbreviations, i.e., <code>tmp</code> is a bad idea <br>
+                should NOT contain the data type, i.e., <code>myStr</code> is a bad idea <br>
+            </li>
+            <li><code>using System</code> needed for IO. etc, pretty much the same thing as using namespace std.</li>
         </ul>
+    </div>
+
+    <div id="ds">
+        <h2>Data Structures</h2>
+        <h4>Array</h4>
+        <pre><code>// declare and initialize: 2 ways
+string[] names = new string[3]; // then initialize
+string[] names = { "Amy", "Bob", "Carly" };
+// iterate through an array
+foreach (string name in names){...}</code></pre>
     </div>
     
     <div id="functions">
@@ -89,7 +102,11 @@
                 combine verbatim string literal and string interpolation: <code>$@" sth {sth}"</code> <br>
                 tabs <code>\t</code> align the text at a multple of 4 spaces
             </li>
-            <li></li>
+        </ul>
+        
+        <h4>String functions</h4>
+        <ul>
+            <li><code>str.StartsWith(str/char)</code> check if the string starts with the a string or char</li>
         </ul>
     </div>
 </body>
