@@ -6,3 +6,7 @@ div{
     float: none;
     width: 90%;
 }
+
+pre{
+    width: 1000px;
+}

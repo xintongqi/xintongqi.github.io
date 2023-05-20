@@ -32,15 +32,55 @@
             If they span multiple lines, they have to be wrapped in parentheses.</li>
             <li>a JSX expression must have exactly one outermost JSX element, usually just wrap everything with <code>&ltdiv&gt</code></li>
             <li>render JSX
-                <pre><code>
-                    const container = document.getElementById('app');
-                    // createRoot is a function from React; specifies where to put the rendered element
-                    const root = createRoot(container);
-                    // render tells the root to render what is passed; specifies what to render
-                    root.render(&lth1&gtHello world&lt/h1&gt);
-                </code></pre>
+                <pre><code>const container = document.getElementById('app');
+// createRoot is a function from React; specifies where to put the rendered element
+const root = createRoot(container);
+// render tells the root to render what is passed; specifies what to render
+root.render(&lth1&gtHello world&lt/h1&gt);</code></pre>
                 <code>render()</code> only updates DOM elements that have changed when called multiple times
             </li>
+            <li>subtleties: JSX vs html <br>
+                <ul>
+                    <li><code>class</code> tag in html becomes <code>className</code> in JSX. </li>
+                    <li>self-closing tags in html have to end with a forward slash,
+                        e.g., <code>&ltbr&gt</code> in html needs to be changed into <code>&ltbr/&gt</code> in JSX </li>
+                    <li>event listeners: <code>onclick</code> in html is written in camel case in JSX like <code>onClick</code></li>
+                </ul>
+            </li>
+            <li>
+                escape from JSX into JS in the current file: use { }, e.g. <code>const plusOne=&ltdiv&gt{someVar+1}&lt/div&gt&#59</code> <br>
+                note:
+                <ul>
+                    <li>you can access variables defined elsewhere in the same JS file from the brackets</li>
+                    <li>there is no if statement, either pull it out, or use the ternary operator, or use && operator
+                        <pre><code>// method 1: pull it out
+let outputMsg;
+if (success)
+    outputMsg = &ltdiv&gt{message.trueMsg}&lt/div&gt&#59
+else
+    outputMsg = &ltdiv&gt{message.falseMsg}&lt/div&gt&#59
+
+// method 2: ternary operator
+var outputMsg = &ltdiv&gt{success ? message.trueMsg : message.falseMsg}&lt/div&gt&#59
+
+// method 3: && operator
+// format: condition && do sth; if condition is met, then do something
+let outputMsg;
+outputMsg = {success && &ltdiv&gtmessage.trueMsg&lt/div&gt};
+outputMsg = {!success && &ltdiv&gtmessage.falseMsg&lt/div&gt};</code></pre>
+                    </li>
+                </ul>
+            </li>
+            <li>using .map to turn a list of strings into a list of JSX elements
+                <pre><code>const people = ['Rowe', 'Prevost', 'Gare'];
+
+// key=someStr: specifies the key, which allows orders to be preserved from one render to another
+const peopleList = people.map((person,i) =>
+    &ltli key='person_'+i>{person}&lt/li>
+);
+root.render(&ltul>{peopleList}&lt/ul>);</code></pre>
+            </li>
+            <li> write React without JSX: check out <code>React.createElement();</code></li>
         </ul>
     </div>
 
