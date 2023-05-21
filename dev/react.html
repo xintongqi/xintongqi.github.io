@@ -21,6 +21,7 @@
         <a href="../index.html">Back to landing page</a>
         <ul>
             <li><a href="#jsx">JSX</a></li>
+            <li><a href="#app">React Application</a></li>
         </ul>
     </nav>
 
@@ -84,7 +85,63 @@ root.render(&ltul>{peopleList}&lt/ul>);</code></pre>
         </ul>
     </div>
 
-    
+    <div id="app">
+        <h2>React Application</h2>
+        <h4>Application Structure</h4>
+        No single way of structuring the application, but here is one possible way. <br>
+        Note that index.js is usually the entry point (pretty much the same idea as index.html, 
+        the browser first fetches this), app.js is usually located at top level. 
+        <ul>
+            <li>/src/assets: images and global styles</li>
+            <li>/src/layouts: global layouts, such as headers and footers</li>
+            <li>/src/components: building components like buttons, etc.</li>
+            <li>/src/pages: application by page, which consists of multiple components</li>
+            <li>/src/config: for cross-environment development</li>
+            <li>/src/utils: repeatedly used functions</li>
+        </ul>
+        <figure>
+            <img src="../images/react_structure.jpeg" alt="react application file structure" width="800px">
+            <figcaption>image from <a href="https://www.xenonstack.com/insights/reactjs-project-structure">xenonstack</a></figcaption>
+        </figure>
+
+        <h4>Components</h4>
+        A React component is a reusable unit, which often involves rendering html whenever some data changes. <br>
+        To define a component: 
+        <pre><code>/*App.js*/
+// first import lib; 'react' is installed as a dependency
+import React from 'react';
+
+// then use a func to define a component, called func component
+// the name MUST be capitalized, otherwise it's a built-in component
+function SomeComponent(){
+    return &lth1>This is a JSX element, reused as a react component.&lt/h1>;
+}
+
+// export this component
+export default SomeComponent;</code></pre>
+A function component is essentially a set of instructions telling react how to build the component. 
+You can understand it as a global JS function. <br>
+Function components must return some React elements in JSX syntax.
+
+        <pre><code>/*index.js*/
+// only import ReactDOM when you have render-related tasks
+import React from 'react';
+import ReactDOM from 'react-dom/client';
+
+// import the function component from App.js
+import SomeComponent from './App'
+
+// render the component using an html-like syntax
+ReactDOM.createRoot(document.getElementById('app')).render(&ltSomeComponent/>);
+
+/* very similar to the JSX example above, can break it down into
+ * var root = ReactDOM.createRoot(document.getElementById('app'));
+ * root.render(&ltSomeComponent/>);
+ * but if you write it like this, ReactDOM won't update when there is a change in SomeComponent */</code></pre>
+        In a react project, <code>.createRoot()</code> and <code>.render()</code> are usually only called once. 
+        ReactDOM re-renders automatically when there is an update in the components. <br>
+        The argument passed to <code>.createRoot()</code> is usually the main component in <code>index.html</code>.
+    </div>
     
 </body>
 </html>
