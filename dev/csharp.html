@@ -69,7 +69,8 @@ Console.WriteLine("Windows " + 7 + 4);</code></pre>
                 should NOT use abbreviations, i.e., <code>tmp</code> is a bad idea <br>
                 should NOT contain the data type, i.e., <code>myStr</code> is a bad idea <br>
             </li>
-            <li><code>using System</code> needed for IO. etc, pretty much the same thing as using namespace std.</li>
+            <li><code>using System</code> needed for IO. etc, pretty much the same thing as using namespace std. usually included by default.</li>
+            <li><code>switch</code> in c#: possible to put multiple tags together like so <code>case 1: case 2: return true;</code></li>
         </ul>
     </div>
 
@@ -79,8 +80,11 @@ Console.WriteLine("Windows " + 7 + 4);</code></pre>
         <pre><code>// declare and initialize: 2 ways
 string[] names = new string[3]; // then initialize
 string[] names = { "Amy", "Bob", "Carly" };
-// iterate through an array
-foreach (string name in names){...}</code></pre>
+
+// iterate through an array: 2 ways
+// note that you CAN'T modify values in the array with foreach
+foreach (string name in names){...}
+for (int i=0; i&ltnames.Length; i++){...}</code></pre>
     </div>
     
     <div id="functions">
@@ -107,6 +111,9 @@ foreach (string name in names){...}</code></pre>
         <h4>String functions</h4>
         <ul>
             <li><code>str.StartsWith(str/char)</code> check if the string starts with the a string or char</li>
+            <li><code>str.ToUpper()</code> and <code>str.ToLower()</code></li>
+            <li><code>str.Trim()</code> remove leading and trailing spaces</li>
+            <li><code>str.Contains(str/char)</code> check if the string contains that string or char</li>
         </ul>
     </div>
 </body>
