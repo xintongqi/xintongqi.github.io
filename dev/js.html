@@ -55,13 +55,42 @@
         <h2>Basis</h2>
         client-side JS: run on browsers, respond to user actions such as onclick <br>
         server-side JS: run on servers, pretty much like Java servers
-        <h4>declaration</h4>
+        <h4>Variables</h4>
+        Scopes of variables:
         <ul>
-            <li><code>var</code>: local/global, initialization optional</li>
-            <li><code>let</code>: local, initialization optional</li>
-            <li><code>const</code>: local, must be initialized, read-only</li>
+            <li>global: exported variables</li>
+            <li>module: visible in the same module (same file)</li>
+            <li>function: visible in the same function</li>
+            <li>block: visible only in between brackets. different from function-scoped, if you put it in an if-statement it won't be available outside</li>
         </ul>
-        <h4>data types</h4>
+        Three ways to declare variables:
+        <ul>
+            <li><code>var</code>: module-scoped / function-scoped by default; initialization optional</li>
+            <li><code>let</code>: module-scoped / function-scoped / block-scoped by default; initialization optional</li>
+            <li><code>const</code>: module-scoped / function-scoped / block-scoped by default; must be initialized, read-only</li>
+        </ul>
+         <pre><code>var x = 3;
+function countNumber(){
+    var x = 4;
+    console.log(x); // evaluates to 4, these two x are essentially the same
+}
+console.log(x); // this is also 4 </code></pre>
+<pre><code>let x = 3;
+function countNumber(){
+    let x = 4; // error: cannot declare x twice
+    console.log(x); 
+}
+console.log(x);</code></pre>
+        Additional notes: <br>
+        Hoisted declaration: if you access a <code>var</code> before it is declared, it's actually ok, but it'll evaluate to undefined.
+        Note that this does NOT apply to <code>let</code> and <code>const</code>. <br>
+        Constants cannot have the same name as other functions or variables in the same scope. <br>
+        Constants allow mutations: you cannot change value, but you can change values inside.
+        <pre><code>const MY_ARR = [100, 200];
+MY_ARR[0] = 200; // this is allowed
+MY_ARR = [200, 300]; // this is NOT allowed</code></pre>
+
+        <h4>Data Types</h4>
         <pre><code>// strings, numbers, booleans
 let str1 = 'hello'; 
 let str2 = "hello";
@@ -73,13 +102,98 @@ let names = ["Amy", 2023, "Bob", 4096, "Carly", true];
 
 // objects
 let header = document.querySelector('h1');</code></pre>
-        <h4>flow control</h4>
-        Never, ever use <code>==</code> in JS. Use <code>===</code> and <code>!==</code>.
+        Notes on data types: <br>
+        JS is dynamically typed. <br>
+        Apart from primitive types (boolean, number...), there are wrappers called literals, 
+        pretty much the same idea as Java primitive and wrappers (int and Integer). Strings, arrays and objects are literals.<br>
+       <br>
+       More about strings: <br>
+       <code>+</code> are concats when one of the operands is a string. <br>
+       string interpolation: <br>
+       <pre><code>const name = 'Lev', time = 'today';
+`Hello ${name}, how are you ${time}?`</code></pre>
+
+        <h4>Control Flow</h4>
+        Never, ever use <code>==</code> in JS. Use <code>===</code> and <code>!==</code>. <br>
+        These are considered false in evaluation: <code>false, undefined, null, 0, NaN, ""</code>.
+        <pre><code>// boolean objects and primitives are different!
+const obj = new Boolean(false);
+if (obj) // true 
+if (obj == false) // true
+if (obj === false) // false
+
+const pri = false;
+if (pri) // false 
+if (pri == false) // true
+if (pri === false) // true</code></pre>
+            
+            <h4>Loops</h4>
+            Let's skip for, while, do-while, and look at the JS version of foreach: two variations, for...in and for...of. 
+            <pre><code>const arr = [3, 5, 7];
+arr.foo = "hello";
+
+for (const i in arr) // for...in iterates over keys, which are indexes for arrayss
+    console.log(i); // "0" "1" "2" "foo"
+
+for (const i of arr) // for...of iterates over values
+    console.log(i); // Logs: 3 5 7 there is no hello because it only looks at indexed property
+                </code></pre>
+
+            <h4>Label Statement</h4>
+            Basically an alternative to boolean flag, very similar to <code>goto</code> in C. <br>
+            Note that when you use lable on a loop, the value of the iterator does not start all over but continues with what's left.
+            <pre><code>// The first for statement is labeled "loop1"
+loop1: for (let i = 0; i &lt 3; i++) {
+    // The second for statement is labeled "loop2"
+    loop2: for (let j = 0; j &lt 3; j++) {
+    if (i === 1 && j === 1)
+        continue loop1; // can use lable statement with either continue or break
+    console.log(`i = ${i}, j = ${j}`);
+    }
+}
+
+// Logs:
+// i = 0, j = 0
+// i = 0, j = 1
+// i = 0, j = 2
+// i = 1, j = 0 if you change continue to break, logs stop after this line is printed
+// i = 2, j = 0
+// i = 2, j = 1
+// i = 2, j = 2</code></pre>
+
+            <h4>Error Handling</h4>
+            <pre><code>funtion myFunc() {
+    // ... 
+    if (success)
+        return true;
+    throw new Error("Execution failed!");
+}
+
+try {
+    myFunc();
+} catch (e) {
+    console.error(e, e.stack); // other alternatives available, e.g., console.error(e.message);
+} finally {
+    // clean up...
+    // if there is a return statement here, whatever returned here is the return value of this try-catch-finally block
+    // return statements and throw statements prior to this return will be ignored
+}</code></pre>
+        Nesting try-catch-finally: possible. but the inner block must either has a catch block or a finally block.
+
     </div>
     
     <div id="ds">
         <h2>Data Structures</h2>
-        <h4>collections</h4>
+        <h4>Array Literals</h4>
+        Arrays are not variables, they are literals. 
+        <pre><code>let names = ["Amy", 2023, , 4096, "Carly", true]; // this is okay. names.length = 6, names[2] = &ltempty item>
+let names = ["Amy", 2023, , 4096, "Carly", true,] // names.length = 6, only trailing commas are ignored</code></pre>
+
+        <h4>Objects</h4>
+        <pre><code>const car = { myCar: "Saturn", getCar: carTypes("Honda"), special: sales };
+const car = { "!": "Saturn", "?": carTypes("Honda"), "|": sales }; // invalid property names must be enclosed in quotes.</code></pre>
+
+        <h4>Collections</h4>
     </div>
     
 </body>
