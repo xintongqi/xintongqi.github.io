@@ -1,4 +1,5 @@
-Hi, glad you found my blogs :)
+I know, I know, dirty code and bad organization.
+But this is my website and I do whatever I want 😌
 
 <!-- ## Welcome to GitHub Pages
 
