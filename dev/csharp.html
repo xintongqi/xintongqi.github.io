@@ -30,6 +30,7 @@
     <div id="env">
         <h2>Environment</h2>
         <ul>
+            <li>instantiate a new csharp project: enter the folder and <code>dotnet new console --framework net7.0</code> to create a new console project</li>
             <li>access through vscode: build, run, etc.</li>
             <li>access through terminal: <code>dotnet build</code> and <code>dotnet run</code></li>
         </ul>
@@ -41,6 +42,10 @@
             <li>case sensitive</li>
             <li>end statement with semicolon</li>
             <li>data types
+                value types (primitives: integral, floating-point...) and reference types (objects: string, array...). <br>
+                integral types: <code>sbyte, short, int, long</code> and <code>byte, ushort, uint, ulong</code> <br>
+                floating-point types: <code>float, double, decimal</code> <br>
+                value types are disposed after stack is destroyed because they are stored on the stack, but reference types remain in memory.
                 <pre><code>char c = 'c';
 int i = 123;
 decimal d = 1.23m; 
@@ -48,11 +53,14 @@ decimal d = 1.23m;
 // by default it's double, use suffix f for float and m for decimal
 string s = "hello";
 bool b = true;</code></pre>
-                can also declare variables implicitly with <code>var</code>, but data type is fixed once you declare it. <br>
-                type conversions: <br>
-                <code>int</code> is converted into <code>string</code> in concats. <br>
-                for numeric values: cast explicitly, use either brackets or corresponding suffices <br>
-                compound assignment <code>++, +=</code> allowed; note pre/post increment/decrement <br>
+                can also declare variables implicitly with <code>var</code>, but data type is fixed once you declare it.<br>
+                compound assignment <code>++, +=</code> allowed; note pre/post increment/decrement. <br>
+                Three way type conversions between numeric data:
+                <ol>
+                    <li>casting with curly brackets, e.g., <code>int num = (int)(1.5m); // num=1</code></li>
+                    <li>casting with suffices, e.g., <code>decimal num = 1.5m</code></li>
+                    <li>this is NOT casting, <code>Convert.ToInt32(1.5m)=2</code>. it rounds up instead of truncate</li>
+                </ol>
                 <pre><code>// this line prints Windows 74 instead of Windows 11
 Console.WriteLine("Windows " + 7 + 4);</code></pre>
             </li>
@@ -85,24 +93,24 @@ string[] names = { "Amy", "Bob", "Carly" };
 // note that you CAN'T modify values in the array with foreach
 foreach (string name in names){...}
 for (int i=0; i&ltnames.Length; i++){...}</code></pre>
+            Array functions:
+            <pre><code>Array.Sort(names);
+Array.Reverse(names);
+Array.Clear(names, idx, num); // set [num] elements starting at [idx] to null, but the length of the array is unchanged.
+Array.Resize(ref names, size); // resize the array to [size], padded with null element or remove the last few elements
+                               // there is no method to remove null elements only
+
+            </code></pre>
     </div>
     
     <div id="functions">
         <h2>Functions</h2>
-        <!-- <table>
-            <tr>
-                <th style="width: 15%;">I/O</th>
-                <th style="width: 15%;">...</th>
-                <th style="width: 15%;">...</th>
-                <th>...</th>
-              </tr>
-        </table> -->
         <h4>I/O</h4>
         <ul>
             <li>
                 <code>Console.WriteLine()</code> and <code>Console.Write()</code>: work for int, decimal, string, char... <br>
                 verbatim string literal: <code>@"    some string"</code> works pretty much like <code>&ltpre&gt</code> in html, note that it ignores special characters such as <code>\n</code> within the string <br>
-                string interpolation: <code>string message = $"Hello {firstName}!";</code> <br>
+                string interpolation: <code>string message = $"Hello {firstName}!";</code>. can also be done with <code>string message = string.Format("Hello {0}!", firstName);</code><br>
                 combine verbatim string literal and string interpolation: <code>$@" sth {sth}"</code> <br>
                 tabs <code>\t</code> align the text at a multple of 4 spaces
             </li>
@@ -110,10 +118,66 @@ for (int i=0; i&ltnames.Length; i++){...}</code></pre>
         
         <h4>String functions</h4>
         <ul>
-            <li><code>str.StartsWith(str/char)</code> check if the string starts with the a string or char</li>
-            <li><code>str.ToUpper()</code> and <code>str.ToLower()</code></li>
-            <li><code>str.Trim()</code> remove leading and trailing spaces</li>
-            <li><code>str.Contains(str/char)</code> check if the string contains that string or char</li>
+            <li> conversion between string and other data types 
+                <pre><code>/* string and char array */
+// turn string into char array
+char[] charArray = s.ToCharArray();
+
+// turn char array into string, note that ToString() won't work
+string s = new string(charArray);
+string s = String.Join(delimiter, charArray);
+
+
+/* string and numeric values */
+// turn string into numeric value
+int num = Int32.Parse(s); // throws an exception if s cannot be parsed
+Int32.TryParse(s, out num); // returns a boolean; out is a keyword that specifies the output
+int.TryParse(s, out num); 
+int num = Convert.ToInt32(s); // same thing, returns 0 when s is null instead of throwing an exception
+
+// turn numeric value into string
+string s = num.ToString();</code></pre>
+            </li>
+            <li>
+                string formatting
+                <pre><code>// string interpolation
+string result = string.Format("{0} {1}!", first, second);
+
+// format numeric values
+decimal num = 12345.6789m;
+string s1 = string.Format("num: {0:C}", num); // :C currency, 2 digits precision, with dollar sign
+string s2 = string.Format("num: {0:N4}", num); // :Nx number with comma, x specifies precision
+string s3 = string.Format("num: {0:P2}", num); // :Px percentage, x specifies precision
+
+// alignment
+Console.WriteLine(input.PadLeft(12)); // pad the string to the left until it's 12 digits long
+                                      // note that it's NOT padding 12 spaces to the left
+Console.WriteLine(input.PadLeft(12, '-')); // pad with -</code></pre>
+            </li>
+            <li> string manipulation
+                <pre><code>// find stuff
+string s = "ABC def";
+s.StartsWith(char/str);
+s.Contains(char/str);
+int first = s.IndexOf(char/str);
+int last = s.LastIndexOf(char/str);
+
+char[] searchThese = {e, B};
+int any = s.IndexOfAny(searchThese); // first = 1, finds the first symbol that belongs to the char[]
+
+// extract stuff
+string subs = s.Substring(idx, length); 
+string[] strArray = s.Split(delimiter);
+
+// remove stuff
+s.Trim(); //remove leading and trailing spaces
+s.Remove(idx, length);
+
+// replace stuff
+s.ToUpper(); 
+s.ToLower();
+s.Replace(char1/str1, char2/str2);</code></pre>
+            </li>
         </ul>
     </div>
 </body>
