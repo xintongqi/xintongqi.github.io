@@ -38,45 +38,55 @@
 
     <div id="basis">
         <h2>Basis</h2>
+        <h4>Data Types</h4>
+        value types (primitives: integral, floating-point...) and reference types (objects: string, array...). <br>
+        value types are disposed after stack is destroyed because they are stored on the stack, but reference types remain in memory.
         <ul>
-            <li>case sensitive</li>
-            <li>end statement with semicolon</li>
-            <li>data types
-                value types (primitives: integral, floating-point...) and reference types (objects: string, array...). <br>
-                integral types: <code>sbyte, short, int, long</code> and <code>byte, ushort, uint, ulong</code> <br>
-                floating-point types: <code>float, double, decimal</code> <br>
-                value types are disposed after stack is destroyed because they are stored on the stack, but reference types remain in memory.
-                <pre><code>char c = 'c';
+            <li>integral types: <code>sbyte, short, int, long</code> and <code>byte, ushort, uint, ulong</code></li>
+            <li>floating-point types: <code>float, double, decimal</code></li>
+        </ul>
+        <pre><code>char c = 'c';
 int i = 123;
 decimal d = 1.23m; 
 // float: 32 bit, double: 64 bit, decimal: 128 bit
 // by default it's double, use suffix f for float and m for decimal
 string s = "hello";
 bool b = true;</code></pre>
-                can also declare variables implicitly with <code>var</code>, but data type is fixed once you declare it.<br>
-                compound assignment <code>++, +=</code> allowed; note pre/post increment/decrement. <br>
-                Three way type conversions between numeric data:
-                <ol>
-                    <li>casting with curly brackets, e.g., <code>int num = (int)(1.5m); // num=1</code></li>
-                    <li>casting with suffices, e.g., <code>decimal num = 1.5m</code></li>
-                    <li>this is NOT casting, <code>Convert.ToInt32(1.5m)=2</code>. it rounds up instead of truncate</li>
-                </ol>
-                <pre><code>// this line prints Windows 74 instead of Windows 11
+            can also declare variables implicitly with <code>var</code>, but data type is fixed once you declare it.<br>
+            Three way type conversions between numeric data:
+            <ol>
+                <li>casting with curly brackets, e.g., <code>int num = (int)(1.5m); // num=1</code></li>
+                <li>casting with suffices, e.g., <code>decimal num = 1.5m</code></li>
+                <li>this is NOT casting, <code>Convert.ToInt32(1.5m)=2</code>. it rounds up instead of truncate</li>
+            </ol>
+            <pre><code>// this line prints Windows 74 instead of Windows 11
 Console.WriteLine("Windows " + 7 + 4);</code></pre>
-            </li>
-            <li>
-                stateful (instance) vs stateless methods (static): <br>
-                the former relies on memory, the latter does not, i.e., need to instantiate for stateful method but not need for stateless ones.
-            </li>
-            <li>
-                OOP <br>
-                similar to Java, instantiate through the <code>new</code> keyword. <br>
-            </li>
-            <li>
-                variable naming convention: <br>
-                should NOT use abbreviations, i.e., <code>tmp</code> is a bad idea <br>
-                should NOT contain the data type, i.e., <code>myStr</code> is a bad idea <br>
-            </li>
+
+        <h4>Naming Conventions</h4>
+        <ul>
+            <li>should NOT use abbreviations, e.g., <code>tmp</code> is a bad idea</li>
+            <li>should NOT contain the data type, e.g., <code>myStr</code> is a bad idea</li>
+            <li>methods should be capitalized, e.g. <code>PrintMyName()</code></li>
+        </ul>
+
+        <h4>Methods</h4>
+        stateful (instance) vs stateless methods (static): <br>
+        the former relies on memory, the latter does not, i.e., need to instantiate for stateful method but not need for stateless ones. <br>
+        <br>
+        csharp is pass by value. If you want to pass by reference, you can use the <code>ref</code> keyword. <br>
+        <br>
+        named arguments and optional arguments
+        <pre><code>// original func declaration
+void RSVP(string name, int partySize, string allergies, bool inviteOnly);
+
+//named arguments: make func calls without specifying order by specifying the names of the params
+RSVP(name: "Linh", partySize: 2, allergies: "none", inviteOnly: false);
+
+// optional arguments: set default values for the func declaration
+void RSVP(string name, int partySize = 1, string allergies = "none", bool inviteOnly = true);</code></pre>
+
+        <h4>Others</h4>
+        <ul>
             <li><code>using System</code> needed for IO. etc, pretty much the same thing as using namespace std. usually included by default.</li>
             <li><code>switch</code> in c#: possible to put multiple tags together like so <code>case 1: case 2: return true;</code></li>
         </ul>
@@ -98,9 +108,7 @@ for (int i=0; i&ltnames.Length; i++){...}</code></pre>
 Array.Reverse(names);
 Array.Clear(names, idx, num); // set [num] elements starting at [idx] to null, but the length of the array is unchanged.
 Array.Resize(ref names, size); // resize the array to [size], padded with null element or remove the last few elements
-                               // there is no method to remove null elements only
-
-            </code></pre>
+                               // there is no method to remove null elements only</code></pre>
     </div>
     
     <div id="functions">
@@ -117,6 +125,7 @@ Array.Resize(ref names, size); // resize the array to [size], padded with null e
         </ul>
         
         <h4>String functions</h4>
+        Strings are immutable objects in csharp.
         <ul>
             <li> conversion between string and other data types 
                 <pre><code>/* string and char array */

@@ -131,6 +131,10 @@ let str2 = "hello";
 let num = 5.20;
 let success = true;
 
+// BigInt: cannot directly convert into primitives
+const a = Number(1n) + 2; // 3
+const b = 1n + BigInt(2); // 3n
+
 // arrays: doesn't have to be same data type
 let names = ["Amy", 2023, "Bob", 4096, "Carly", true];
 
@@ -149,9 +153,11 @@ let header = document.querySelector('h1');</code></pre>
 
         <h4 id="basis_op">Operators</h4>
         <pre><code>** // exponentiation
->>> // unsigned right shift
+>> // signed right shift (left pad with 1 if the number is negative)
+>>> // unsigned right shift (left pad with 0 regardless of the sign), BigInt doesn't support this
 x??=1; // assigns x=1 if x is null</code></pre>
-        desctructuring assignment <br>
+
+        desctructuring assignment
         <pre><code>const foo = ["one", "two", "three"];
 
 // without destructuring
@@ -161,7 +167,55 @@ const three = foo[2];
 
 // with destructuring
 const [one, two, three] = foo;</code></pre> 
-        
+        arithmatics <br>
+        <pre><code>1/0 === Infinity;
+1/2 === 1.0/2.0;</code></pre>
+
+        logical operators (short circuit)
+        <pre><code>const and1 = "Cat" && "Dog"; // true && true returns Dog
+
+const or1 = "Cat" || "Dog"; // true || true returns Cat
+const or2 = false || "Cat"; // f || t returns Cat
+const or3 = "Cat" || false; // t || f returns Cat
+
+const not1 = !"Cat"; // !t returns false</code></pre>
+
+        <code>delete</code> operator: deletes an object's property. Don't use it on arrays.
+        <pre><code>delete object.property;
+delete object[propertyKey];
+delete objectName[index];
+
+// note that you cannot delete system defined properties
+delete Math.PI; // can't do this</code></pre>
+
+        <code>typeof</code> operator
+        <pre><code>typeof myFun; // const myFun = new Function("5 + 2"); returns "function"
+typeof shape; // const shape = "round"; returns "string"
+typeof size; // const size = 1; returns "number"
+typeof foo; // const foo = [1,2,3]; returns "object"
+typeof null; // returns "object"
+typeof doesntExist; // returns "undefined" </code></pre>
+
+        <code>in</code> operator: check if the object contains that property
+        <pre><code>// Arrays
+const trees = ["redwood", "bay", "cedar", "oak", "maple"];
+0 in trees; // returns true, 0 is index
+"bay" in trees; // returns false (CANNOT use in to check if the array contains an element)
+"length" in trees; // returns true (length is an Array property)
+
+// Strings
+const myString = new String("coral");
+"length" in myString; // returns true
+
+// Objects
+const mycar = { make: "Honda", model: "Accord", year: 1998 };
+"model" in mycar; // returns true</code></pre>
+
+        <code>instanceof</code> operator: check if the object is of a type
+        <pre><code>const theDay = new Date(1995, 12, 17);
+if (theDay instanceof Date) {
+  // statements to execute
+}</code></pre>
 
         <h4 id="basis_ctrl">Control Flow</h4>
         Never, ever use <code>==</code> in JS. Use <code>===</code> and <code>!==</code>. <br>

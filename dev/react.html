@@ -9,6 +9,15 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.7.0/build/styles/default.min.css">
     <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.7.0/build/highlight.min.js"></script>
     <script>hljs.highlightAll();</script>
+    <style>
+        #app_dropdown{
+            display: none;
+        }
+        #app_dropdown li{
+            padding: 0;
+            margin: 0;
+        }
+    </style>
 </script>
 </head>
 <body>
@@ -21,9 +30,28 @@
         <a href="../index.html">Back to landing page</a>
         <ul>
             <li><a href="#jsx">JSX</a></li>
-            <li><a href="#app">React Application</a></li>
+            <li id="app_title">React Application</li>
+            <ul id="app_dropdown">
+                <li><a href="#app_structure">Application Structure</a></li>
+                <li><a href="#app_com">Components</a></li>
+                <li><a href="#app_inter">Component Interactions</a></li>
+                <li><a href="#app_props">Props</a></li>
+            </ul>
         </ul>
     </nav>
+
+    <script type="text/javascript">
+        function expand() {
+          let dropdown = document.getElementById("app_dropdown");
+          if (dropdown.style.display === "none") {
+            dropdown.style.display = "block";
+          } else {
+            dropdown.style.display = "none"
+          }
+        }
+
+        document.getElementById("app_title").addEventListener("click", expand);     
+    </script>
 
     <div id="jsx">
         <h2>JSX</h2>
@@ -87,7 +115,7 @@ root.render(&ltul>{peopleList}&lt/ul>);</code></pre>
 
     <div id="app">
         <h2>React Application</h2>
-        <h4>Application Structure</h4>
+        <h4 id="app_structure">Application Structure</h4>
         No single way of structuring the application, but here is one possible way. <br>
         Note that index.js is usually the entry point (pretty much the same idea as index.html, 
         the browser first fetches this), app.js is usually located at top level. 
@@ -104,7 +132,7 @@ root.render(&ltul>{peopleList}&lt/ul>);</code></pre>
             <figcaption>image from <a href="https://www.xenonstack.com/insights/reactjs-project-structure">xenonstack</a></figcaption>
         </figure>
 
-        <h4>Components</h4>
+        <h4 id="app_com">Components</h4>
         A React component is a reusable unit, which often involves rendering html whenever some data changes. <br>
         To define a component: 
         <pre><code>/*App.js*/
@@ -141,6 +169,60 @@ ReactDOM.createRoot(document.getElementById('app')).render(&ltSomeComponent/>);
         In a react project, <code>.createRoot()</code> and <code>.render()</code> are usually only called once. 
         ReactDOM re-renders automatically when there is an update in the components. <br>
         The argument passed to <code>.createRoot()</code> is usually the main component in <code>index.html</code>.
+
+        <h4 id="app_inter">Component Interactions</h4>
+<pre><code>function RabbitImage(){
+    return &ltimg src="../rabbit" alt="rabbit"/>;
+} // a child of DisplayImage
+
+function DisplayImage(){
+    return &ltdiv> &ltRabbitImage/> &lt/div>
+}</code></pre>
+
+        <h4 id="app_props">Props</h4>
+        Each component has a prop, which is an object. <br>
+        What props are to components is similar to what attributes are to html elements. <br>
+        <br>
+        Props are usually used to pass info from parent to child. 
+        They can be anything: strings, boolean, numbers, event handlers...
+        <pre><code>/* ShowProp.js */
+// parent: pass props to component, wrap with {} if the value is not a string
+function HandleClick(){
+    alert("Don't rush! I'm handling the event!");
+}
+
+function ShowProp(){
+    return &ltGreeting name="Bob" age={56} onClick={HandleClick}> Hello World &lt/Greeting>; 
+} // names of the props don't really matter, you can change them to myHandler={HandleClick}
+  // everything in between html tags, i.e. Hello World, can be access by child through props.children
+
+
+/* Greeting.js */
+// child
+function Greeting(props){
+    return (
+        &lth1 onClick={props.onClick}> 
+            {props.name}, aged {props.age}, says = {props.children}
+        &lth1/>
+    );
+}
+
+export default Greeting;</code></pre>
+
+        setting default values for props: three ways
+        <pre><code> // write in parameter
+function Greeting({message='Hello World'}){...}
+
+// write in function body
+function Greeting(props){
+    const {message = 'Hello World'} = props;
+    // ...
+}
+
+// write outside function
+Greeting.defaultProps = {
+  message: 'Hello World',
+};</code></pre>
     </div>
     
 </body>
