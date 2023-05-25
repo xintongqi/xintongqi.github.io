@@ -9,6 +9,15 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.7.0/build/styles/default.min.css">
     <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.7.0/build/highlight.min.js"></script>
     <script>hljs.highlightAll();</script>
+    <style>
+        #basis_dropdown{
+            display: none;
+        }
+        #basis_dropdown li{
+            padding: 0;
+            margin: 0;
+        }
+    </style>
 </script>
 </head>
 <body>
@@ -21,11 +30,31 @@
         <a href="../index.html">Back to landing page</a>
         <ul>
             <li><a href="#env">Environment</a></li>
-            <li><a href="#basis">Basis</a></li>
+            <li id="basis_title">Basis</li>
+            <ul id="basis_dropdown">
+                <li><a href="#basis_data">Data Types</a></li>
+                <li><a href="#basis_name">Naming Conventions</a></li>
+                <li><a href="#basis_methods">Methods</a></li>
+                <li><a href="#basis_ex">Exception Handling</a></li>
+                <li><a href="#basis_others">Others</a></li>
+            </ul>
             <li><a href="#ds">Data Structures</a></li>
             <li><a href="#functions">Functions</a></li>
         </ul>
     </nav>
+
+    <script type="text/javascript">
+        function expand() {
+          let dropdown = document.getElementById("basis_dropdown");
+          if (dropdown.style.display === "none") {
+            dropdown.style.display = "block";
+          } else {
+            dropdown.style.display = "none"
+          }
+        }
+
+        document.getElementById("basis_title").addEventListener("click", expand);     
+    </script>
 
     <div id="env">
         <h2>Environment</h2>
@@ -34,11 +63,39 @@
             <li>access through vscode: build, run, etc.</li>
             <li>access through terminal: <code>dotnet build</code> and <code>dotnet run</code></li>
         </ul>
+        Debug with vscode: the configuration file. See <a href="https://learn.microsoft.com/en-gb/training/modules/implement-visual-studio-code-debugging-tools/6-examine-launch-configurations">here</a> 
+        for what each of these does, but I guess they don't matter that much in our case.
+        <pre><code>{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            // Use IntelliSense to find out which attributes exist for C# debugging
+            // Use hover for the description of the existing attributes
+            // For further information visit https://github.com/OmniSharp/omnisharp-vscode/blob/master/debugger-launchjson.md
+            "name": ".NET Core Launch (console)",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "build",
+            // If you have changed target frameworks, make sure to update the program path.
+            "program": "${workspaceFolder}/bin/Debug/net7.0/test.dll",
+            "args": [],
+            "cwd": "${workspaceFolder}",
+            // For more information about the 'console' field, see https://aka.ms/VSCode-CS-LaunchJson-Console
+            "console": "internalConsole",
+            "stopAtEntry": false
+        },
+        {
+            "name": ".NET Core Attach",
+            "type": "coreclr",
+            "request": "attach"
+        }
+    ]
+}</code></pre>
     </div>
 
     <div id="basis">
         <h2>Basis</h2>
-        <h4>Data Types</h4>
+        <h4 id="basis_data">Data Types</h4>
         value types (primitives: integral, floating-point...) and reference types (objects: string, array...). <br>
         value types are disposed after stack is destroyed because they are stored on the stack, but reference types remain in memory.
         <ul>
@@ -62,14 +119,14 @@ bool b = true;</code></pre>
             <pre><code>// this line prints Windows 74 instead of Windows 11
 Console.WriteLine("Windows " + 7 + 4);</code></pre>
 
-        <h4>Naming Conventions</h4>
+        <h4 id="basis_name">Naming Conventions</h4>
         <ul>
             <li>should NOT use abbreviations, e.g., <code>tmp</code> is a bad idea</li>
             <li>should NOT contain the data type, e.g., <code>myStr</code> is a bad idea</li>
             <li>methods should be capitalized, e.g. <code>PrintMyName()</code></li>
         </ul>
 
-        <h4>Methods</h4>
+        <h4 id="basis_methods">Methods</h4>
         stateful (instance) vs stateless methods (static): <br>
         the former relies on memory, the latter does not, i.e., need to instantiate for stateful method but not need for stateless ones. <br>
         <br>
@@ -85,7 +142,40 @@ RSVP(name: "Linh", partySize: 2, allergies: "none", inviteOnly: false);
 // optional arguments: set default values for the func declaration
 void RSVP(string name, int partySize = 1, string allergies = "none", bool inviteOnly = true);</code></pre>
 
-        <h4>Others</h4>
+        <h4 id="basis_ex">Exception Handling</h4>
+        <pre><code>try{
+    // can also use the checked keyword for OverflowException, which truncates the most significant bits
+} catch (Exception ex) {
+    // ex.Message, ex.StackTrace...
+} finally {
+    // clean up
+}</code></pre>
+        types of exceptions:
+        <ul>
+            <li>compiler generated: you can't instantiate with <code>new</code>, you can only catch them
+                <ul>
+                    <li><code>ArrayTypeMismatchException</code> array can't store a particular data type because of type mismatch</li>
+                    <li><code>DivideByZeroException</code></li>
+                    <li><code>FormatException</code> invalid argument formatting, e.g. <code>Parse()</code></li>
+                    <li><code>IndexOutOfRangeException</code></li>
+                    <li><code>InvalidCastException</code></li>
+                    <li><code>NullReferenceException</code></li>
+                    <li><code>OverflowException</code> arithmatic operation overflows</li>
+                </ul>
+            </li>
+            <li>customized: create a new instance with <code>new</code>, then <code>throw</code> it<br>
+                can pass Message to the constructor, but once you set it, it's readonly.
+                <ul>
+                    <li><code>ArgumentException</code> invalid arguments</li>
+                    <li><code>InvalidOperationException</code> depending on the state of the object, a certain operation may be invalid</li>
+                    <li><code>NotSupportedException</code>regardless of the state of the object, the operation is always invalid</li>
+                    <li><code>IOException</code></li>
+                    <li><code>FormatException</code> string or output formatting</li>
+                </ul>
+            </li>
+        </ul>
+
+        <h4 id="basis_others">Others</h4>
         <ul>
             <li><code>using System</code> needed for IO. etc, pretty much the same thing as using namespace std. usually included by default.</li>
             <li><code>switch</code> in c#: possible to put multiple tags together like so <code>case 1: case 2: return true;</code></li>
