@@ -36,6 +36,7 @@
                 <li><a href="#app_com">Components</a></li>
                 <li><a href="#app_inter">Component Interactions</a></li>
                 <li><a href="#app_props">Props</a></li>
+                <li><a href="#app_hooks">Hooks</a></li>
             </ul>
         </ul>
     </nav>
@@ -223,6 +224,57 @@ function Greeting(props){
 Greeting.defaultProps = {
   message: 'Hello World',
 };</code></pre>
+
+        use the <code>map</code> function to create an array of components
+        <pre><code>import React from 'react';
+import {comments} from './commentData'; // data source, an array
+
+import Card from './Card';
+
+function App(){
+  return comments.map(comments =>
+    &ltCard commentObject = {comments} />
+  );
+}
+
+export default App;</code></pre>
+
+        <h4 id="app_hooks">Hooks</h4>
+        hooks record the state of the application. 
+        <pre><code>import React, {useState} from "react";
+ 
+function Toggle() {
+  const [toggle, setToggle] = useState("Off"); // give it a default value
+ 
+  return (
+    &ltdiv>
+        &ltp>The toggle is {toggle}&lt/p>
+        &ltbutton onClick={() => setToggle("On")}>On&lt/button>
+        &ltbutton onClick={() => setToggle("Off")}>Off&lt/button>
+    &lt/div>
+  );
+}</code></pre>
+        event handling with hooks
+        <pre><code>export default function EmailTextInput() {
+    const [email, setEmail] = useState('');
+
+    // define the handler: 2 ways
+    // method 1
+    const handleChange = (event) => setEmail(event.target.value);
+
+    // method 2
+    const handleChange = ({target}) => setEmail(target.value);
+
+    // return the component with the handler
+    return &ltinput value={email} onChange={handleChange} />
+}</code></pre>
+        React state is asynchronous. To ensure your info is up to date, use a callback function in the handler. 
+        <pre><code>// callback function: function passed as argument
+// here prevIndex is a function that finds the previous index, it's passed as an argument to the state setter
+// since the setter depends on the value of prevIndex, synchronization achieved
+const goToNext = () => setIndex(prevIndex => prevIndex + 1);</code></pre>
+
+            
     </div>
     
 </body>
