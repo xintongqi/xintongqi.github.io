@@ -99,8 +99,25 @@
         value types (primitives: integral, floating-point...) and reference types (objects: string, array...). <br>
         value types are disposed after stack is destroyed because they are stored on the stack, but reference types remain in memory.
         <ul>
-            <li>integral types: <code>sbyte, short, int, long</code> and <code>byte, ushort, uint, ulong</code></li>
-            <li>floating-point types: <code>float, double, decimal</code></li>
+            <li>value types
+                <ul>
+                    <li>integral types: <code>sbyte, short, int, long</code> and <code>byte, ushort, uint, ulong</code></li>
+                    <li>floating-point types: <code>float, double, decimal</code></li>
+                    <li><code>char</code></li>
+                    <li><code>bool</code></li>
+                    <li><code>enum E {...}</code> user defined, a set of named constant</li>
+                    <li>nullable values: <code>int? nullableInt;</code></li>
+                    <li>tuple value <code>(double, int) tuple1 = (4.5, 3);</code></li>
+                </ul>
+            </li>
+            <li>reference types
+                <ul>
+                    <li>class: <code>string</code> is also a class type</li>
+                    <li>interface: same as Java, cannot have detailed method implementation</li>
+                    <li>array</li>
+                    <li>delegate</li>
+                </ul>
+            </li>
         </ul>
         <pre><code>char c = 'c';
 int i = 123;

@@ -144,6 +144,26 @@ let header = document.querySelector('h1');</code></pre>
         Apart from primitive types (boolean, number...), there are wrappers called literals, 
         pretty much the same idea as Java primitive and wrappers (int and Integer). Strings, arrays and objects are literals.<br>
        <br>
+
+        More about numbers: <br>
+        JS numbers are 64 bit doubles. For numbers that require more digits, use <code>BigInt</code>.<br>
+        apart from numeric values, numbers have three other values: <code>+Infinity</code>, <code>-Infinity</code>, <code>NaN</code>. <br>
+        binary <code>0b1001</code>, octal <code>0o1234</code>, hex <code>0x1234</code>. <br>
+        exponent <code>123e-2=1.23</code>, <code>123e2=12300</code>. Note that e and E are the same. <br>
+        number object: 
+        <pre><code>const biggestNum = Number.MAX_VALUE;
+const smallestNum = Number.MIN_VALUE;
+const infiniteNum = Number.POSITIVE_INFINITY;
+const negInfiniteNum = Number.NEGATIVE_INFINITY;
+const notANum = Number.NaN;</code></pre>
+        math object:
+        <pre><code>Math.PI;
+Math.sin(3.14);
+Math.abs(-3);
+Math.pow(2);
+Math.floor(2.4);
+Math.min(2,4,5);</code></pre>
+
        More about strings: <br>
        <code>+</code> are concats when one of the operands is a string. <br>
        string interpolation: <br>
