@@ -31,7 +31,7 @@
         <ul>
             <li><a href="#env">Environment</a></li>
             <li id="basis_title">Basis</li>
-            <ul id="basis_dropdown">
+            <ul id="basis_dropdown" style="display: none;">
                 <li><a href="#basis_data">Data Types</a></li>
                 <li><a href="#basis_name">Naming Conventions</a></li>
                 <li><a href="#basis_methods">Methods</a></li>
@@ -40,11 +40,16 @@
             </ul>
             <li><a href="#ds">Data Structures</a></li>
             <li><a href="#functions">Functions</a></li>
+            <li id="wpf_title">WPF</li>
+            <ul id="wpf_dropdown" style="display: none;">
+                <li><a href="#wpf_xaml">XAML</a></li>
+                <li><a href="#wpf_pattern">Modal-View-ViewModel</a></li>
+            </ul>
         </ul>
     </nav>
 
     <script type="text/javascript">
-        function expand() {
+        function basis_expand() {
           let dropdown = document.getElementById("basis_dropdown");
           if (dropdown.style.display === "none") {
             dropdown.style.display = "block";
@@ -53,7 +58,18 @@
           }
         }
 
-        document.getElementById("basis_title").addEventListener("click", expand);     
+        document.getElementById("basis_title").addEventListener("click", basis_expand);
+
+        function wpf_expand() {
+          let dropdown = document.getElementById("wpf_dropdown");
+          if (dropdown.style.display === "none") {
+            dropdown.style.display = "block";
+          } else {
+            dropdown.style.display = "none"
+          }
+        }
+
+        document.getElementById("wpf_title").addEventListener("click", wpf_expand);     
     </script>
 
     <div id="env">
@@ -295,6 +311,38 @@ s.ToLower();
 s.Replace(char1/str1, char2/str2);</code></pre>
             </li>
         </ul>
+    </div>
+
+    <div id="wpf">
+        <h2>WPF</h2>
+        WPF is Windows Presentation Foundation, basically a framework used to build windows desktop app; it is primarily in c sharp (frontend UI). <br>
+
+        <h4 id="wpf_xaml">XAML</h4>
+        <ul>
+            <li>a variant of xml, looks like React. case sensitive. </li>
+            <li>converts tabs into spaces; preserves only one space if there are many</li>
+            <li>attributes need to be set as strings, e.g., <code>&ltThickness Left="10"></code></li>
+        </ul>
+
+        <pre><code> &lt!-- root element --&gt
+&ltPage x:Class="index.Page1"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      Title="Page1">
+&lt/Page>
+
+&ltStackPanel> &lt!-- object syntax --&gt
+    &ltButton Click="Button_Clicked"/> &lt!-- attribute syntax --&gt
+&lt/StackPanel>
+
+&ltButton> &lt!-- property element syntax --&gt
+    &ltButton.Content>
+        This is a button
+    &lt/Button.Content>
+&lt/Button></code></pre>
+
+        <h4 id="wpf_pattern">Modal-View-ViewModel Design Pattern</h4>
+        
     </div>
 </body>
 </html>
