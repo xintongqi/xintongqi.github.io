@@ -274,6 +274,22 @@ function Toggle() {
 // since the setter depends on the value of prevIndex, synchronization achieved
 const goToNext = () => setIndex(prevIndex => prevIndex + 1);</code></pre>
 
+        Different types of hooks:
+        <ol>
+            <li>state hook: takes an argument of the intial state; <br> <code>[state_var, set_state_var] = useState(initial_val)</code></li>
+            <li>effect hook: when DOM changes, this function is called; <br> <code>useEffect(() => { //... });</code></li>
+            <li>context hook: subscribe to global context (theme...) <br><code>useContext(someContext);</code></li>
+            <li>reducer hook: an alternative to state hook; 
+                different from useState, it takes another argument <code>reducer</code>, which is basically a function called on an array of states;
+                also, the state now becomes an array of states<br>
+                <code>[state_vars, set_state_var] = useState(reducer, initial_vals)</code>
+            </li>
+        </ol>
+        Rules for hooks:
+        <ol>
+            <li>only call hooks at the top level; do not call hooks inside loops, conditions or nested functions</li>
+            <li>only call hooks from react function components; do not call hooks from JS functions</li>
+        </ol>
             
     </div>
     

@@ -390,7 +390,12 @@ console.log(a2); // [8, 6, 7, 9]
 const a3 = a.map((s) => s.length);
 
 console.log(a3); // [8, 6, 7, 9]</code></pre>
-
+        arrow functions vs regular functions declare with <code>function</code>:
+        <ol>
+            <li><code>this</code> inside an arrow function always refer to the outer function; but in a regular function it could refer to many things</li>
+            <li>arrow function cannot be used with the <code>new</code> keyword, i.e., constructors have to be regular functions</li>
+            <li>you don't need to <code>return</code> in an arrow function</li>
+        </ol>
     </div>
     
     <div id="ds">
