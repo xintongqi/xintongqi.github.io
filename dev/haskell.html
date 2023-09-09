@@ -1,0 +1,76 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Haskell</title>
+    <link rel="stylesheet" href="../styles/main.css">
+    <link href="../styles/print.css" media="print" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.7.0/build/styles/default.min.css">
+    <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.7.0/build/highlight.min.js"></script>
+    <script>hljs.highlightAll();</script>
+    <!-- <style>
+        #basis_dropdown{
+            display: none;
+        }
+        #basis_dropdown li{
+            padding: 0;
+            margin: 0;
+        }
+    </style> -->
+</script>
+</head>
+<body>
+    <header>
+        <h1>Haskell Beginner Friendly</h1>
+    </header>
+    
+    <nav>
+        <p><b>Haskell</b></p>
+        <a href="../index.html">Back to landing page</a>
+        <ul>
+            <!-- <li id="basis_title">Basis</li>
+            <ul id="basis_dropdown" style="display: none;">
+                <li><a href="#basis_data">Data Types</a></li>
+            </ul> -->
+            <li><a href="#env">Env</a></li>
+        </ul>
+    </nav>
+
+    <!-- <script type="text/javascript">
+        function basis_expand() {
+          let dropdown = document.getElementById("basis_dropdown");
+          if (dropdown.style.display === "none") {
+            dropdown.style.display = "block";
+          } else {
+            dropdown.style.display = "none"
+          }
+        }
+
+        document.getElementById("basis_title").addEventListener("click", basis_expand);
+    </script> -->
+
+    <div>
+        OK, this page is indeed beginner friendly because I'm also pretty new to Haskell. <br>
+        But I guess by beginner I mean beginner to functional programming, NOT beginner to programming.
+    </div>
+
+    <div id="env">
+        <h2>Environment Related</h2>
+
+        Steps to step to set up the env on a Mac with Intel chip: follow <a href="https://www.haskell.org/ghcup/steps/">this guide</a> <br>
+        Several ways to compile and run: 
+        <ul>
+            <li>the CML way:<code>runghc -Wall hello.hs -fforce-recomp</code>; run the code, with warning</li>
+            <li>the interactive way:<code>ghci</code>; load a file using <code>load hello.hs</code></li>
+            <li>stack: I personally prefer this one; edit the code with highlighting in vscode then compile and run with stack. some commands:
+                <ul>
+                    <li><code>stack new proj-name template-name</code>: cannot have underscore in the project name; <code>new-template</code> by default for template name</li>
+                    <li><code>stack build</code>: </li>
+                </ul>
+            </li>
+        </ul>
+    </div>
+
+</body>
+</html>
