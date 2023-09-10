@@ -8,8 +8,15 @@
     <link href="../styles/print.css" media="print" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.7.0/build/styles/default.min.css">
     <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.7.0/build/highlight.min.js"></script>
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>
+        MathJax = {
+          tex: {inlineMath: [['$', '$'], ['\\(', '\\)']]}
+        };
+    </script>
     <script>hljs.highlightAll();</script>
-    <!-- <style>
+    <style>
         #basis_dropdown{
             display: none;
         }
@@ -17,27 +24,30 @@
             padding: 0;
             margin: 0;
         }
-    </style> -->
+    </style>
 </script>
 </head>
 <body>
     <header>
-        <h1>Haskell Beginner Friendly</h1>
+        <h1>Haskell</h1>
     </header>
     
     <nav>
         <p><b>Haskell</b></p>
         <a href="../index.html">Back to landing page</a>
         <ul>
-            <!-- <li id="basis_title">Basis</li>
-            <ul id="basis_dropdown" style="display: none;">
-                <li><a href="#basis_data">Data Types</a></li>
-            </ul> -->
             <li><a href="#env">Env</a></li>
+            <li><a href="#principle">Principles</a></li>
+            <li id="basis_title">Basis</li>
+            <ul id="basis_dropdown" style="display: none;">
+                <li><a href="#basis_func">Functions</a></li>
+                <li><a href="#basis_list">Lists</a></li>
+                <li><a href="#basis_tuple">Tuples</a></li>
+            </ul>
         </ul>
     </nav>
 
-    <!-- <script type="text/javascript">
+    <script type="text/javascript">
         function basis_expand() {
           let dropdown = document.getElementById("basis_dropdown");
           if (dropdown.style.display === "none") {
@@ -48,11 +58,11 @@
         }
 
         document.getElementById("basis_title").addEventListener("click", basis_expand);
-    </script> -->
+    </script>
 
     <div>
         OK, this page is indeed beginner friendly because I'm also pretty new to Haskell. <br>
-        But I guess by beginner I mean beginner to functional programming, NOT beginner to programming.
+        But I guess by beginner I mean beginner to functional programming, NOT beginner to programming as a whole.
     </div>
 
     <div id="env">
@@ -61,12 +71,129 @@
         Steps to step to set up the env on a Mac with Intel chip: follow <a href="https://www.haskell.org/ghcup/steps/">this guide</a> <br>
         Several ways to compile and run: 
         <ul>
-            <li>the CML way:<code>runghc -Wall hello.hs -fforce-recomp</code>; run the code, with warning</li>
-            <li>the interactive way:<code>ghci</code>; load a file using <code>load hello.hs</code></li>
-            <li>stack: I personally prefer this one; edit the code with highlighting in vscode then compile and run with stack. some commands:
+            <li>the CML way: <code>runghc -Wall hello.hs -fforce-recomp</code>; run the code, with warning</li>
+            <li>the interactive way: <code>ghci</code>; load a file using <code>load hello.hs</code></li>
+            <li>stack: I personally prefer this one; edit the code with highlighting in vscode then compile and run with stack. Some commands:
                 <ul>
-                    <li><code>stack new proj-name template-name</code>: cannot have underscore in the project name; <code>new-template</code> by default for template name</li>
-                    <li><code>stack build</code>: </li>
+                    <li><code>stack new proj-name template-name</code>: cannot have underscore in the project name; <code>new-template</code> by default for template if you don't specify one</li>
+                    <li><code>stack build</code>: compiles and produces an executable <code>proj-name-exe</code>; this executable is hidden in the document tree</li>
+                    <li><code>stack exec proj-name-exe</code>: run the executable</li>
+                    <li><code>stack test</code>: run the test suite</li>
+                    <li><code>stack clean</code>: clean compiler output (in <code>.stack-work/dist</code>)</li>
+                    <li><code>stack purge</code>: revert the project to a clean state; a throrough cleaning...</li>
+                    <li><code>stack init</code>: creating the <code>stack.yaml</code> file</li>
+                </ul>
+            </li>
+        </ul>
+        document tree of stack
+        <ul>
+            <li><code>app/Main.hs</code>: entrypoint</li>
+            <li><code>src/Lib.hs</code>: libs</li>
+            <li><code>test/Spec.hs</code>: test code</li>
+            <li><code>Setup.hs</code>: configuration for cabal</li>
+            <li><code>helloworld.cabal</code>: automatically updated for cabal</li>
+            <li><code>package.yaml</code>: generates a cabal file, which you should NOT modify; specify dependencies here</li>
+            <li><code>stack.yaml</code>: configuration file for stack; <code>resolver</code>: compiler settings, <code>packages</code>: local package path</li>
+            <li><code>README.md</code>, <code>.gitignore</code>, <code>ChangeLog.md</code> and <code>LICENSE</code></li>
+        </ul>
+    </div>
+
+    <div id="principle">
+        <h2>Principles</h2>
+        <ul>
+            <li>Principles of functional programming
+                <ul>
+                    <li>function is first class: functions themselves are values</li>
+                    <li>Haskell programs is centered around evaluating expressions rather than executing instructions</li>
+                    <li>indentation matters: if you indent more it'll just be added to the previous line; if you indent less the block is terminated</li>
+                </ul>
+            </li>
+            <li>
+                Principles of Haskell
+                <ul>
+                    <li><span class="highlight_yellow">everything is immutable</span>; think of variables not as boxes but as unique names for values <br>
+                        e.g. <code>x=7</code> means "define x to be 7" <br>
+                        e.g. <code>x=7 y=x+5</code> when you change the value of x, the value of y stays the same</li>
+                    <li><span class="highlight_yellow">no side effect</span> so parallelism is possible</li>
+                    <li><span class="highlight_yellow">lazy</span>: things are not evaluated until their results are needed</li>
+                    <li><span class="highlight_yellow">statically typed</span>: types must match for haskell expressions; there is NO implicit type conversion in haskell <br>
+                        <code>"somestr"==5</code> yields an error</li>
+                    <li>names in haskell can't start with uppercase letters; <code>_</code> alone is a placeholder</li>
+                </ul>
+            </li>
+            <li>
+                Data types: <code>Int, Integer, Bool, Double, Char, String</code>
+            </li>
+        </ul>
+    </div>
+
+    <div id="basis">
+        <h2>Basis</h2>
+
+        <h3 id="basis_func">Functions</h3>
+        Call a function
+        <ul>
+            <li>function calls have higher precedence than all other operations, it'll use the following values as the argument once it receives it. <br>
+                e.g. <code>succ 9 + max 5 4 + 1</code> yields <code>16</code>
+            </li>
+            <li>backticks enables you to use function as an infix operator <br>
+                e.g. <code>15 `max` 16</code> is the same as <code>max 15 16</code>
+            </li>
+            <li>
+                parenthesis enables you to use a binary operator as a function <br>
+                e.g. <code>(+) 15 16</code> is the same as <code>15 + 16</code>
+            </li>
+        </ul>
+        Define a function
+        <ul>
+            not that there is no return statement in haskell; every function in haskell must return something
+            <li>simple function <br> 
+            e.g. <code>area a b = a * b</code></li>
+            <li><code>let...in</code> function: <br>
+            e.g. <code>cylinder r h = <b>let</b> sideArea = 2 * pi * r * h topArea = pi * r^2 <b>in</b> sideArea + 2 * topArea</code></li>
+            <li><code>where</code> function: <br>
+            e.g. <code>cylinder r h = sideArea + 2 * topArea <b>where</b> sideArea = 2 * pi * r * h topArea = pi * r^2</code></li>
+        </ul>
+
+        <h3 id="basis_list">Lists</h3>
+        lists in haskell are singular linked lists. Only elements of the same data type are allowed to be in the same list. <br>
+        But this is allowed because it's a list of lists: <code>[[1,2],[8,11,5],[4,5]]</code>
+        <ul>
+            <li>create a list: note that when you create a list you always do a deep copy
+                <ul>
+                    <li><code>mylist = [1,2,3]</code></li>
+                    <li>using the <code>cons</code> operator: takes one element and a list
+                        e.g. <code>1:2:3:[]</code> yields <code>[1,2,3]</code></li>
+                    <li>using the <code>++</code> operator: takes two lists; think concat two linked list, the first list is traversed <br>
+                        e.g. <code>["a","b","c"] ++ "de"</code> </li>
+                    <li>using list ranges <code>..</code>: only works on integers and chars <br>
+                        e.g. <code>[1..20]</code> <br>
+                        e.g. <code>[1..]</code> this is an infinite list, don't print out the whole thing, use <code>take</code></li>
+                    <li>create a cyclic list: <code>cycle, repeat, replicate</code><br>
+                        e.g. <code>cycle [1,2,3]</code><br>
+                        e.g. <code>repeat 5</code><br>: you get an infinite list of 5s <br>
+                        e.g. <code>replicate 15 6</code>: you get fifteen 6s
+                    </li>
+                </ul>
+            </li>
+            <li>operations on a list: <code>head, tail, init, last, length, reverse, take, drop, maximum, minimum, sum, product, elem</code> <br>
+                some of these operations are expensive don't use them
+            </li>
+            <li>list comprehensions: these are pretty much like sets definition in math; can have multiple guards and generators<br>
+                e.g. <code>[x*2 | x &lt- [1..10]]</code> this is equivalent to the set $\{x*2 \mid x \in \mathbb{N} \text{ and } x \in [1,10]\}$ <br>
+                e.g. <code>[ x | x &lt- [1..100], x `mod` 7 == 0, x `mod` 5 == 0 ]</code> multiple guards <br>
+                e.g. <code>[ x + y | x &lt- [100,200..400], y &lt- [0..3] ]</code> multiple generators, applies right to left <br>
+            </li>
+        </ul>
+
+        <h3 id="basis_tuple">Tuples</h3>
+        Tuples are not homogenous, meaning they can contain multiple data types.
+        <ul>
+            <li>create a tuple
+                <ul>
+                    <li><code>mytuple = (1, "hello")</code></li>
+                    <li><code>zip</code> two lists: the shorter list dominates <br>
+                    e.g. <code>zip "Stephen" [1..]</code> yields <code>[('S',1),('t',2),('e',3),('p',4),('h',5),('e',6),('n',7)]</code></li>
                 </ul>
             </li>
         </ul>
