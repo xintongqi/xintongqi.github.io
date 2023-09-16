@@ -36,6 +36,7 @@
             <li><a href="#basis">Basis</a></li>
             <li><a href="#ds">Data Structures</a></li>
             <li><a href="#numpy">NumPy</a></li>
+            <li><a href="#oop">OOP</a></li>
         </ul>
     </nav>
 
@@ -190,6 +191,35 @@ nparray[nparray>5] # returns all elements in the array with value greater than 5
 np.flip(nparray, axis=?) # flip an array means reversing the elements in the array</code></pre>
             </li>
         </ul>
+    </div>
+
+    <div id="oop">
+        <h3>OOP</h3>
+        Everything in python classes are public. <br>
+        More on Python magic methods, <a href="https://rszalski.github.io/magicmethods/">see here</a>
+        <pre><code># skeleton code for a python class
+class MyClass:
+    myProperty = 1
+
+    def __init__(self, propValue): # this is one of the magic methods of Python classes
+        self.myProperty = propValue
+
+    def myMethod():
+        # do something
+
+    def myMethod2(self): # self refers to this object; doesn't have to be self, but must be the first parameter
+        # do something with this object
+
+# inheritance
+class MyChildClass(MyClass):
+    def inheritedMethod1():
+        super().myMethod()
+        # do something else here
+
+# how you would use a python class
+myObject = MyClass(100)
+print(myObject.myProperty)
+myObject.myMethod2()</code></pre>
     </div>
 </body>
 </html>

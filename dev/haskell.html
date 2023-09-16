@@ -122,7 +122,13 @@
                 </ul>
             </li>
             <li>
-                Data types: <code>Int, Integer, Bool, Double, Char, String</code>
+                Data types: <code>Int, Integer, Bool, Double, Char, String</code>: <code>String</code> is equivalent to <code>[Char]</code>
+            </li>
+            <li>
+                Good practices:
+                <ul>
+                    <li>top-level type declaration for every function: e.g. <code>add :: Int -> Int -> Int</code></li>
+                </ul>
             </li>
         </ul>
     </div>
@@ -131,6 +137,7 @@
         <h2>Basis</h2>
 
         <h3 id="basis_func">Functions</h3>
+        Function data type: with multiple arguments, functions are actually function that returns functions that returns functions...each of these functions is a single argument function
         Call a function
         <ul>
             <li>function calls have higher precedence than all other operations, it'll use the following values as the argument once it receives it. <br>
@@ -153,6 +160,14 @@
             e.g. <code>cylinder r h = <b>let</b> sideArea = 2 * pi * r * h topArea = pi * r^2 <b>in</b> sideArea + 2 * topArea</code></li>
             <li><code>where</code> function: <br>
             e.g. <code>cylinder r h = sideArea + 2 * topArea <b>where</b> sideArea = 2 * pi * r * h topArea = pi * r^2</code></li>
+            <li>pattern matching: note that patterns are evaluated in order, so put specific first <br>
+            e.g. <code>digitToStr :: Integral a => a -> String <br> digitToStr 1 = "One" <br> digitToStr _ = "Other numbers"</code></li>
+        </ul>
+        Standard prelude functions
+        <ul>
+            <li><code>odd</code></li>
+            <li><code>filter</code>: used on a list; use it together with some other functions as a guard</li>
+            <li><code>compare</code></li>
         </ul>
 
         <h3 id="basis_list">Lists</h3>
