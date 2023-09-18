@@ -37,6 +37,7 @@
             <li><a href="#ds">Data Structures</a></li>
             <li><a href="#numpy">NumPy</a></li>
             <li><a href="#oop">OOP</a></li>
+            <li><a href="#plt">Matplotlib</a></li>
         </ul>
     </nav>
 
@@ -220,6 +221,21 @@ class MyChildClass(MyClass):
 myObject = MyClass(100)
 print(myObject.myProperty)
 myObject.myMethod2()</code></pre>
+    </div>
+
+    <div id="plt">
+        <h2>Matplotlib</h2>
+
+        <h3>Pyplot</h3>
+        You can't really plot a function directly. 
+        To plot a function, you have to use numpy to create a list of points and then plot these points. <br>
+        <pre><code>x = np.arange(0,1) 
+y =  np.log(math.comb(100, 40)) # put your function here
+plt.title("Matplotlib demo") 
+plt.xlabel("x axis caption") 
+plt.ylabel("y axis caption") 
+plt.plot(x,y) 
+plt.show()</code></pre>
     </div>
 </body>
 </html>
