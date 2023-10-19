@@ -44,6 +44,7 @@
                 <li><a href="#basis_list">Lists</a></li>
                 <li><a href="#basis_tuple">Tuples</a></li>
             </ul>
+            <li><a href="#types">Types</a></li>
         </ul>
     </nav>
 
@@ -169,6 +170,15 @@
             <li><code>filter</code>: used on a list; use it together with some other functions as a guard</li>
             <li><code>compare</code></li>
         </ul>
+        Pattern matching
+        <pre><code>factorial :: (Eq a, Num a) => a -> a
+factorial 0 = 1 <br>
+factorial n = n * factorial (n - 1)</code></pre>
+        Guards
+        <pre><code>bmiTell :: (RealFloat a) => a -> String <br>
+bmiTell bmi <b>|</b> bmi &lt= 18.5 = "You're underweight, you emo, you!" <br>
+<b>|</b> bmi &lt= 25.0 = "You're supposedly normal. Pffft, I bet you're ugly!" <br>
+<b>|</b> otherwise = "You're a whale, congratulations!"</code></pre>
 
         <h3 id="basis_list">Lists</h3>
         lists in haskell are singular linked lists. Only elements of the same data type are allowed to be in the same list. <br>
@@ -212,6 +222,10 @@
                 </ul>
             </li>
         </ul>
+    </div>
+
+    <div id="types">
+
     </div>
 
 </body>
