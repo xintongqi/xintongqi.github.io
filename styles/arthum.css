@@ -1,11 +1,20 @@
-nav {
-    float: left;
+header {
     display: block;
-    border: black, 1pt, solid;
+    position: fixed;
+    width: 100%;
+    padding: 10px;
+}
+
+nav {
+    display: block;
+    position: fixed;
+    top: 60px;
+    float: left;
     width: 15%;
-    padding-left: 0%;
-    padding-right: 0%;
-    padding-top: 20pt;
+    height: calc(100vh - 60px); 
+    overflow-y: auto;
+    padding-top: 30pt;
+    padding-left: 10pt;
 }
 
 nav ul {
@@ -20,8 +29,8 @@ nav li{
 div {
     float: right;
     width: 75%;
-    padding-left: 5%;
     padding-right: 5%;
+    padding-left: 5%;
 }
 
 div h2 {
