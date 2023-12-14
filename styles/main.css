@@ -11,9 +11,9 @@ nav {
     top: 60px;
     float: left;
     width: 15%;
-    height: calc(100vh - 60px); 
+    height: calc(100vh - 100px); 
     overflow-y: auto;
-    padding-top: 30pt;
+    padding-top: 40pt;
     padding-left: 10pt;
 }
 
