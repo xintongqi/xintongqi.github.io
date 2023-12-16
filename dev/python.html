@@ -1,4 +1,5 @@
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -6,7 +7,8 @@
     <title>Python</title>
     <link rel="stylesheet" href="../styles/main.css">
     <link href="../styles/print.css" media="print" rel="stylesheet" />
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.7.0/build/styles/default.min.css">
+    <link rel="stylesheet"
+        href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.7.0/build/styles/default.min.css">
     <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.7.0/build/highlight.min.js"></script>
     <script>hljs.highlightAll();</script>
     <!-- <style>
@@ -18,13 +20,14 @@
             margin: 0;
         }
     </style> -->
-</script>
+    </script>
 </head>
+
 <body>
     <header>
         <h1>Python</h1>
     </header>
-    
+
     <nav>
         <a href="../index.html">Back to landing page</a>
         <ul>
@@ -56,10 +59,13 @@
     <div id="basis">
         <h2>Basis</h2>
         <ul>
-            <li>python variables can be any data type. to cast a variable <code>str(5)</code>. single quotes and double quotes are the same for strings. check the type</li>
-            <li><code>print(...)</code> can either be comma-separated or concat, but you can't concat a number to a string</li>
+            <li>python variables can be any data type. to cast a variable <code>str(5)</code>. single quotes and double
+                quotes are the same for strings. check the type</li>
+            <li><code>print(...)</code> can either be comma-separated or concat, but you can't concat a number to a
+                string</li>
             <li>global variable: either do it outside a function, or use the <code>global</code> keyword <br>
-                to change the value of a global variable inside a function, you have to use the <code>global</code> keyword
+                to change the value of a global variable inside a function, you have to use the <code>global</code>
+                keyword
             </li>
             <li>boolean values: None, 0, "", and empty list/set/tuple/dict are <code>False</code></li>
             <li>some boolean operators
@@ -79,25 +85,27 @@ type() # check if the variable is of a type, without checking inheritance
 
 # lambda functions 
 myFunc = lambda arg : arg + 10 # lambda arguments : function body
-print(myFunc(5))</code></pre></li>
+print(myFunc(5))</code></pre>
+            </li>
         </ul>
     </div>
 
     <div id="ds">
         <h2>Data Structures</h2>
-            <pre><code>["apple","banana"] # list, ordered, dynamic array implementation
+        <pre><code>["apple","banana"] # list, ordered, dynamic array implementation
 ("apple", "banana") # tuple, immutable list
 {"apple", "banana"} # set, not ordered, no duplicates allowed
 range(6) # range, integers in range(from, to)
 {"name":"apple", "price":10} # dict</code></pre>
 
-        map function: 
+        map function:
         <code>map(function, iterable)</code> applies the function on every element of the iterable
 
         <h3>lists</h3>
         <ul>
             <li>lists cannot be used as keys in dictionaries, have to be converted to tuple</li>
-            <li>list slicing <code>list[start:end:step]</code>with start inclusive and end exclusive; slicing a list returns a copy of it</li>
+            <li>list slicing <code>list[start:end:step]</code>with start inclusive and end exclusive; slicing a list
+                returns a copy of it</li>
             <li>methods on lists
                 <pre><code>insert()
 append() # insert at last index
@@ -135,7 +143,8 @@ remove()
 set1 | set2 # union
 set1 & set2 # intersection
 set1 - set2 # diff between the two sets
-# one thing to note is that | and & has lower priority than -, so use parenthese when you do set operations</code></pre></li>
+# one thing to note is that | and & has lower priority than -, so use parenthese when you do set operations</code></pre>
+            </li>
         </ul>
 
         <h3>stack, queue and priority queue</h3>
@@ -226,7 +235,7 @@ myObject.myMethod2()</code></pre>
         <h2>Matplotlib</h2>
 
         <h3>Pyplot</h3>
-        You can't really plot a function directly. 
+        You can't really plot a function directly.
         To plot a function, you have to use numpy to create a list of points and then plot these points. <br>
         <pre><code>x = np.arange(0,1) 
 y =  np.log(math.comb(100, 40)) # put your function here
@@ -237,4 +246,5 @@ plt.plot(x,y)
 plt.show()</code></pre>
     </div>
 </body>
+
 </html>

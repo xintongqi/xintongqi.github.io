@@ -1,4 +1,5 @@
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -6,25 +7,28 @@
     <title>C#</title>
     <link rel="stylesheet" href="../styles/main.css">
     <link href="../styles/print.css" media="print" rel="stylesheet" />
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.7.0/build/styles/default.min.css">
+    <link rel="stylesheet"
+        href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.7.0/build/styles/default.min.css">
     <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.7.0/build/highlight.min.js"></script>
     <script>hljs.highlightAll();</script>
     <style>
-        #basis_dropdown{
+        #basis_dropdown {
             display: none;
         }
-        #basis_dropdown li{
+
+        #basis_dropdown li {
             padding: 0;
             margin: 0;
         }
     </style>
-</script>
+    </script>
 </head>
+
 <body>
     <header>
         <h1>C#</h1>
     </header>
-    
+
     <nav>
         <a href="../index.html">Back to landing page</a>
         <ul>
@@ -49,23 +53,23 @@
 
     <script type="text/javascript">
         function basis_expand() {
-          let dropdown = document.getElementById("basis_dropdown");
-          if (dropdown.style.display === "none") {
-            dropdown.style.display = "block";
-          } else {
-            dropdown.style.display = "none"
-          }
+            let dropdown = document.getElementById("basis_dropdown");
+            if (dropdown.style.display === "none") {
+                dropdown.style.display = "block";
+            } else {
+                dropdown.style.display = "none"
+            }
         }
 
         document.getElementById("basis_title").addEventListener("click", basis_expand);
 
         function wpf_expand() {
-          let dropdown = document.getElementById("wpf_dropdown");
-          if (dropdown.style.display === "none") {
-            dropdown.style.display = "block";
-          } else {
-            dropdown.style.display = "none"
-          }
+            let dropdown = document.getElementById("wpf_dropdown");
+            if (dropdown.style.display === "none") {
+                dropdown.style.display = "block";
+            } else {
+                dropdown.style.display = "none"
+            }
         }
 
         document.getElementById("wpf_title").addEventListener("click", wpf_expand);     
@@ -74,11 +78,14 @@
     <div id="env">
         <h2>Environment</h2>
         <ul>
-            <li>instantiate a new csharp project: enter the folder and <code>dotnet new console --framework net7.0</code> to create a new console project</li>
+            <li>instantiate a new csharp project: enter the folder and
+                <code>dotnet new console --framework net7.0</code> to create a new console project
+            </li>
             <li>access through vscode: build, run, etc.</li>
             <li>access through terminal: <code>dotnet build</code> and <code>dotnet run</code></li>
         </ul>
-        Debug with vscode: the configuration file. See <a href="https://learn.microsoft.com/en-gb/training/modules/implement-visual-studio-code-debugging-tools/6-examine-launch-configurations">here</a> 
+        Debug with vscode: the configuration file. See <a
+            href="https://learn.microsoft.com/en-gb/training/modules/implement-visual-studio-code-debugging-tools/6-examine-launch-configurations">here</a>
         for what each of these does, but I guess they don't matter that much in our case.
         <pre><code>{
     "version": "0.2.0",
@@ -112,11 +119,13 @@
         <h2>Basis</h2>
         <h4 id="basis_data">Data Types</h4>
         value types (primitives: integral, floating-point...) and reference types (objects: string, array...). <br>
-        value types are disposed after stack is destroyed because they are stored on the stack, but reference types remain in memory.
+        value types are disposed after stack is destroyed because they are stored on the stack, but reference types
+        remain in memory.
         <ul>
             <li>value types
                 <ul>
-                    <li>integral types: <code>sbyte, short, int, long</code> and <code>byte, ushort, uint, ulong</code></li>
+                    <li>integral types: <code>sbyte, short, int, long</code> and <code>byte, ushort, uint, ulong</code>
+                    </li>
                     <li>floating-point types: <code>float, double, decimal</code></li>
                     <li><code>char</code></li>
                     <li><code>bool</code></li>
@@ -141,14 +150,14 @@ decimal d = 1.23m;
 // by default it's double, use suffix f for float and m for decimal
 string s = "hello";
 bool b = true;</code></pre>
-            can also declare variables implicitly with <code>var</code>, but data type is fixed once you declare it.<br>
-            Three way type conversions between numeric data:
-            <ol>
-                <li>casting with curly brackets, e.g., <code>int num = (int)(1.5m); // num=1</code></li>
-                <li>casting with suffices, e.g., <code>decimal num = 1.5m</code></li>
-                <li>this is NOT casting, <code>Convert.ToInt32(1.5m)=2</code>. it rounds up instead of truncate</li>
-            </ol>
-            <pre><code>// this line prints Windows 74 instead of Windows 11
+        can also declare variables implicitly with <code>var</code>, but data type is fixed once you declare it.<br>
+        Three way type conversions between numeric data:
+        <ol>
+            <li>casting with curly brackets, e.g., <code>int num = (int)(1.5m); // num=1</code></li>
+            <li>casting with suffices, e.g., <code>decimal num = 1.5m</code></li>
+            <li>this is NOT casting, <code>Convert.ToInt32(1.5m)=2</code>. it rounds up instead of truncate</li>
+        </ol>
+        <pre><code>// this line prints Windows 74 instead of Windows 11
 Console.WriteLine("Windows " + 7 + 4);</code></pre>
 
         <h4 id="basis_name">Naming Conventions</h4>
@@ -160,7 +169,8 @@ Console.WriteLine("Windows " + 7 + 4);</code></pre>
 
         <h4 id="basis_methods">Methods</h4>
         stateful (instance) vs stateless methods (static): <br>
-        the former relies on memory, the latter does not, i.e., need to instantiate for stateful method but not need for stateless ones. <br>
+        the former relies on memory, the latter does not, i.e., need to instantiate for stateful method but not need for
+        stateless ones. <br>
         <br>
         csharp is pass by value. If you want to pass by reference, you can use the <code>ref</code> keyword. <br>
         <br>
@@ -186,7 +196,8 @@ void RSVP(string name, int partySize = 1, string allergies = "none", bool invite
         <ul>
             <li>compiler generated: you can't instantiate with <code>new</code>, you can only catch them
                 <ul>
-                    <li><code>ArrayTypeMismatchException</code> array can't store a particular data type because of type mismatch</li>
+                    <li><code>ArrayTypeMismatchException</code> array can't store a particular data type because of type
+                        mismatch</li>
                     <li><code>DivideByZeroException</code></li>
                     <li><code>FormatException</code> invalid argument formatting, e.g. <code>Parse()</code></li>
                     <li><code>IndexOutOfRangeException</code></li>
@@ -199,8 +210,10 @@ void RSVP(string name, int partySize = 1, string allergies = "none", bool invite
                 can pass Message to the constructor, but once you set it, it's readonly.
                 <ul>
                     <li><code>ArgumentException</code> invalid arguments</li>
-                    <li><code>InvalidOperationException</code> depending on the state of the object, a certain operation may be invalid</li>
-                    <li><code>NotSupportedException</code>regardless of the state of the object, the operation is always invalid</li>
+                    <li><code>InvalidOperationException</code> depending on the state of the object, a certain operation
+                        may be invalid</li>
+                    <li><code>NotSupportedException</code>regardless of the state of the object, the operation is always
+                        invalid</li>
                     <li><code>IOException</code></li>
                     <li><code>FormatException</code> string or output formatting</li>
                 </ul>
@@ -209,8 +222,11 @@ void RSVP(string name, int partySize = 1, string allergies = "none", bool invite
 
         <h4 id="basis_others">Others</h4>
         <ul>
-            <li><code>using System</code> needed for IO. etc, pretty much the same thing as using namespace std. usually included by default.</li>
-            <li><code>switch</code> in c#: possible to put multiple tags together like so <code>case 1: case 2: return true;</code></li>
+            <li><code>using System</code> needed for IO. etc, pretty much the same thing as using namespace std. usually
+                included by default.</li>
+            <li><code>switch</code> in c#: possible to put multiple tags together like so
+                <code>case 1: case 2: return true;</code>
+            </li>
         </ul>
     </div>
 
@@ -225,31 +241,34 @@ string[] names = { "Amy", "Bob", "Carly" };
 // note that you CAN'T modify values in the array with foreach
 foreach (string name in names){...}
 for (int i=0; i&ltnames.Length; i++){...}</code></pre>
-            Array functions:
-            <pre><code>Array.Sort(names);
+        Array functions:
+        <pre><code>Array.Sort(names);
 Array.Reverse(names);
 Array.Clear(names, idx, num); // set [num] elements starting at [idx] to null, but the length of the array is unchanged.
 Array.Resize(ref names, size); // resize the array to [size], padded with null element or remove the last few elements
                                // there is no method to remove null elements only</code></pre>
     </div>
-    
+
     <div id="functions">
         <h2>Functions</h2>
         <h4>I/O</h4>
         <ul>
             <li>
-                <code>Console.WriteLine()</code> and <code>Console.Write()</code>: work for int, decimal, string, char... <br>
-                verbatim string literal: <code>@"    some string"</code> works pretty much like <code>&ltpre&gt</code> in html, note that it ignores special characters such as <code>\n</code> within the string <br>
-                string interpolation: <code>string message = $"Hello {firstName}!";</code>. can also be done with <code>string message = string.Format("Hello {0}!", firstName);</code><br>
+                <code>Console.WriteLine()</code> and <code>Console.Write()</code>: work for int, decimal, string,
+                char... <br>
+                verbatim string literal: <code>@"    some string"</code> works pretty much like <code>&ltpre&gt</code>
+                in html, note that it ignores special characters such as <code>\n</code> within the string <br>
+                string interpolation: <code>string message = $"Hello {firstName}!";</code>. can also be done with
+                <code>string message = string.Format("Hello {0}!", firstName);</code><br>
                 combine verbatim string literal and string interpolation: <code>$@" sth {sth}"</code> <br>
                 tabs <code>\t</code> align the text at a multple of 4 spaces
             </li>
         </ul>
-        
+
         <h4>String functions</h4>
         Strings are immutable objects in csharp.
         <ul>
-            <li> conversion between string and other data types 
+            <li> conversion between string and other data types
                 <pre><code>/* string and char array */
 // turn string into char array
 char[] charArray = s.ToCharArray();
@@ -314,7 +333,8 @@ s.Replace(char1/str1, char2/str2);</code></pre>
 
     <div id="wpf">
         <h2>WPF</h2>
-        WPF is Windows Presentation Foundation, basically a framework used to build windows desktop app; it is primarily in c sharp (frontend UI). <br>
+        WPF is Windows Presentation Foundation, basically a framework used to build windows desktop app; it is primarily
+        in c sharp (frontend UI). <br>
 
         <h4 id="wpf_xaml">XAML</h4>
         <ul>
@@ -341,7 +361,8 @@ s.Replace(char1/str1, char2/str2);</code></pre>
 &lt/Button></code></pre>
 
         <h4 id="wpf_pattern">Modal-View-ViewModel Design Pattern</h4>
-        
+
     </div>
 </body>
+
 </html>
