@@ -1,0 +1,251 @@
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KX class</title>
+    <link rel="stylesheet" href="../styles/main.css">
+    <link href="../styles/print.css" media="print" rel="stylesheet" />
+    <link rel="stylesheet"
+        href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.7.0/build/styles/default.min.css">
+    <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.7.0/build/highlight.min.js"></script>
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>
+        MathJax = {
+            tex: { inlineMath: [['$', '$'], ['\\(', '\\)']] }
+        };
+        hljs.registerLanguage('q', q)
+    </script>
+    <script>hljs.highlightAll();</script>
+    <style>
+        #basis_dropdown {
+            display: none;
+        }
+
+        #basis_dropdown li {
+            padding: 0;
+            margin: 0;
+        }
+
+        .blue_font {
+            color: blue;
+        }
+    </style>
+    </script>
+</head>
+
+<body>
+    <header>
+        <h1>KX Class</h1>
+    </header>
+
+    <nav>
+        <a href="../index.html">Back to landing page</a>
+        <ul>
+            <li id="l1_title">Level 1</li>
+            <ul id="l1_dropdown" style="display: none;">
+                <li><a href="#l1qsql">Q-sql</a></li>
+                <li><a href="#l1list">List</a></li>
+                <li><a href="#l1table">Table</a></li>
+            </ul>
+        </ul>
+    </nav>
+
+    <script type="text/javascript">
+        function basis_expand() {
+            let dropdown = document.getElementById("l1_dropdown");
+            if (dropdown.style.display === "none") {
+                dropdown.style.display = "block";
+            } else {
+                dropdown.style.display = "none"
+            }
+        }
+
+        document.getElementById("l1_title").addEventListener("click", basis_expand);
+    </script>
+
+    <div id="l1qsql">
+        <h2>Level 1: Q-SQL</h2>
+
+        <h3>How to read table meta</h3>
+        what each column does:
+        <ul>
+            <li>c: column name</li>
+            <li>t: column type</li>
+            <li>f: foreign keys</li>
+            <li>a: attributes - modifiers for performance characters</li>
+        </ul>
+        <pre><code class="q">
+            c        | t f a
+            -----------------
+            date     | d
+            month    | m
+            vendor   | s
+            time     | p   s 
+        </code></pre>
+
+        <h3>fby</h3>
+        Use <code>fby</code> when you find yourself trying to apply a filter to the aggregated column of a table
+        produced by <code>select...by...</code><br>
+        The basic syntax is:
+        <pre><code class="q">(aggregation;data) fby group</code></pre>
+        where <code>aggregation</code> is the aggregation function you want to apply, <code>data</code> is the column
+        you want to filter, and <code>group</code> is the column you want to group by. <br>
+
+        <h4>Example</h4>
+        Say you have this intermediate table, and you want to select from the original table <code>jan09</code> based on
+        type of vendor, but only records with <code>duration</code> greater than <code>avgDuration</code>, which is
+        simply the average of
+        <code>duration</code>.
+        <pre><code class="q">
+        q) res: select avgDuration: avg duration by vendor from jan09
+        q) res
+        vendor | avgDuration
+        ----------------------
+        CMT    |  6.480017e+11
+        DDS    |  7.600017e+11
+        VTS    |  7.290017e+11
+        </code></pre>
+
+        Without <code>fby</code>, you need to do it like this: <br>
+        First generate this intermediate table, then join <code>jan09</code> with this intermediate table.
+        <pre><code>select from jan09 lj res where duration > avgDuration</code></pre>
+
+        But with <code>fby</code>, you can do it like this:
+        <pre><code>select from jan09 where duration > (avg,duration) fby vendor</code></pre>
+
+        <h4>More on how to use fby</h4>
+        Keep in mind that <code>fby</code> is used as a filter (a where clause) on the aggregated column of a table, so
+        the three signs are 1. a filter, 2. an aggregated value, and 3. a value to group on. Here are more examples:
+        <ol>
+            <li>
+                Which vendor has the largest number of trips when only considering trips shorter than the
+                average duration of each vendor? <br>
+                <b>Where to use fby:</b> "when only considering trips shorter than the
+                average duration of each vendor?" <br>
+                <b>Constructed fby:</b> <code>(avg; duration) fby vendor</code>
+            </li>
+            <li>
+                Which payment type produces the highest average tip when only trups with a fare larger than the average
+                for each vendor is considered? <br>
+                <b>Where to use fby:</b> "when only trups with a fare larger than the average
+                for each vendor is considered?" <br>
+                <b>Constructed fby:</b> <code>(avg; fare) fby vendor</code>
+            </li>
+        </ol>
+
+
+        <h3>xbar</h3>
+        This, together with <code>by</code>, is used to group time/numeric values in to buckets. <br>
+        For example, for each severn day, find the min temperature and the max temperature.
+        <pre><code class="q">select min mintemp, max maxtemp by 7 xbar date from weather</code></pre>
+
+        <h3>Joins</h3>
+        We talk about two types of joins here.
+        <ol>
+            <li>Left joins: the table on the right hand side must be keyed</li>
+            <li>As-of joins: use <code>aj</code> when you want to join two tables based on some column and time, and you
+                want to join based on the last time record. <br>
+                syntax: <code>aj[c;t1;t2]</code> <br>
+                where
+                <ul>
+                    <li>t1 is a table</li>
+                    <li>t2 is a table, usually a simple table</li>
+                    <li>c is a symbol list of column names to join on, and the last column is a sortable type, typically
+                        time</li>
+                </ul>
+                example: <br>
+                <pre><code class="q">aj[`sym`time; trades; quotes]</code></pre>
+                This joins the <code>trades</code> table with the <code>quotes</code> table on the <code>sym</code>
+                column, and then for the <code>time</code> column, here is what it does:
+                for each <code>time</code> value in <code>trades</code>, it finds the last <code>time</code> value in
+                <code>quotes</code> that is less than or equal to the <code>time</code> value in <code>trades</code>.
+                <br>
+                For example, if the <code>trades</code> table has a <code>time</code> value of 10:00:00, and the
+                <code>quotes</code> table has a <code>time</code> value of 9:59:00, 10:00:00, and 10:01:00, then the
+                <code>aj</code> function will return the <code>quotes</code> table with the <code>time</code> value of
+                9:59:00. <br>
+                If you get a <code>`rank</code> error when using <code>aj</code>, likely in <code>t2</code> you have too
+                few columns.
+                It can't only contain the columns in <code>c</code> that you want to perform the join on.
+            </li>
+        </ol>
+
+        <h3>Performance hacks</h3>
+        When writing a <code>where</code> clause, it is always more efficient to put a date filter first, and then
+        filter on the other columns. <br>
+        This is due to how the partitions are stored in kdb.
+    </div>
+
+    <div id="l1list">
+        <h2>Level 1: List</h2>
+
+        <h3>Generate lists</h3>
+        <ul>
+            <li>Retrieving a list from a table: <code>tbl`colname</code></li>
+            <li>sublist: <code>10 sublist L</code>. This picks the first 10 elements from the list L</li>
+            <li>Pick randomly from another list: <code>10?L</code>. This randomly picks 10 elements from list L</li>
+            <li>til</li>
+            <li>enlist</li>
+        </ul>
+
+        <h3>@ operator</h3>
+        Syntax: <code>@[list; indices; operation; value]</code> where operation can be assign <code>:</code>, or add
+        <code>+</code> ,etc. Only the first two parameters are required. <br>
+        When you pass just the list name as the first parameter, e.g., <code>L</code>, this creates a copy of the list.
+        But when you pass the symbol name with a backtick, e.g., <code>`L</code>, this modify the original list in
+        place. <br>
+        Examples:
+        <ol>
+            <li><b>simple index:</b> <code>@[sampleFares;(2*til 5)]</code>. This returns the 0th, 2th, 4th, 6th, and 8th
+                element.</li>
+            <li><b>assign values at indices: </b> <code>@[sampleFares;(2*til 5);:;99f]</code>. This assigns value
+                <code>99f</code> to the 0th, 2th, 4th, 6th, and 8th element.
+            </li>
+        </ol>
+    </div>
+
+    <div id="l1table">
+        <h2>Level 1: Table</h2>
+
+        <h3>Dictionaries</h3>
+        Dictionaries are key-value pairs made of two lists of equal length.
+        <pre><code class="q">
+            q) d: `a`b`c!1 2 3
+            q) d
+            a | 1
+            b | 2
+            c | 3
+        </code></pre>
+
+        <h3>Column dictionaries</h3>
+        If the values of a dictionary are lists, then it is called a column dictionary.
+        <pre><code class="q">
+            q) cd: `a`b`c!(1 2 3; 4 5 6; 7 8 9)
+            q) cd
+            a | 1 2 3
+            b | 4 5 6
+            c | 7 8 9
+        </code></pre>
+
+        <h3>Tables</h3>
+        Tables are flipped column dictionaries.
+        <pre><code class="q">
+            q) t: flip cd
+            q) t
+            a b c
+            -----
+            1 4 7
+            2 5 8
+            3 6 9
+        </code></pre>
+        To make a column the key, use <code>`a xkey t</code>. <br>
+        Note that keyed table and dictionary share the same type <code>99h</code>. A keyed table is NOT a table, but a
+        dictionary.
+    </div>
+
+</body>
+
+</html>
