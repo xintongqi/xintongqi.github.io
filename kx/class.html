@@ -49,6 +49,8 @@
                 <li><a href="#l1qsql">Q-sql</a></li>
                 <li><a href="#l1list">List</a></li>
                 <li><a href="#l1table">Table</a></li>
+                <li><a href="#l1func">Function</a></li>
+                <li><a href="#l1iterator">Iterator</a></li>
             </ul>
         </ul>
     </nav>
@@ -244,6 +246,83 @@
         To make a column the key, use <code>`a xkey t</code>. <br>
         Note that keyed table and dictionary share the same type <code>99h</code>. A keyed table is NOT a table, but a
         dictionary.
+    </div>
+
+    <div id="l1func">
+        <h2>Level 1: Function</h2>
+
+        <h3>Function syntax</h3>
+        Defining a function:
+        <pre><code class="q">
+            func:{[param1; param2]
+                // do something
+                $[condition;
+                    [ // if condition is true
+                        // do this
+                    ];
+                    [ // if condition is false
+                        // do this
+                    ]
+                ];
+                : rtnval;
+            };
+        </code></pre>
+        Two things to note:
+        <ul>
+            <li><b>Explicit/implicit parameters</b>: if you don't want to specify parameters, by default we use x, y,
+                z...</li>
+            <li><b>Explicit/implicit returns</b>
+                In the example we explicitly return <code>rtnval</code>. But by default the function
+                returns the last expression evaluated.</li>
+            <li>A query can also be the body of a function</li>
+        </ul>
+
+        Calling a function:
+        <pre><code class="q">
+            func[param1; param2]
+        </code></pre>
+        Special cases:
+        <ul>
+            <li>To call on a list of values: <code>func[var1 var2; param2]</code></li>
+            <li>To call within a query: <code>select newCol:func[col1; col2] from tbl</code></li>
+        </ul>
+    </div>
+
+    <div id="l1iterator">
+        <h2>Level 1: Iterator</h2>
+
+        Most iteration is handled by q operators implicitly. e.g., <code>1 2 3 + 4 5 6</code><br>
+        But implicit iteartors require that two operands are equal in length. <br>
+        When you need to iterate over two lists of different lengths, you need to use an explicit iterator.
+
+        <h3>Each-left and each-right</h3>
+        We only talk about each-left here for simplicity. Each-right is just the other direction.
+        <pre><code>
+            q) x f\:y
+            // this is equivalent to below
+            q) f[;y] each x
+            q) 1 2 +\: 3 4 5
+            4 5 6
+            5 6 7
+        </code></pre>
+
+        <h3>Each and each-both</h3>
+        <code>each</code> only works on functions with one parameter, such as <code>f[;y]</code> in the example above
+        and <code>count</code>. <br>
+        <code>each-both '</code> works on functions with two parameters, for example <code>take #</code>
+        <pre><code>
+            q) L:("the";"quick";"brown";"fox")
+            q) count each L // only one parameter L, used on the function count
+            3 5 5 3
+            q) 3#'L // two parameters 3 and L, used on the function #
+            "the"
+            "qui"
+            "bro"
+            "fox"
+        </code></pre>
+
+        <h3>Scan and over</h3>
+
     </div>
 
 </body>
