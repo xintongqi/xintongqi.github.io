@@ -1,0 +1,250 @@
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Python</title>
+    <link rel="stylesheet" href="../styles/main.css">
+    <link href="../styles/print.css" media="print" rel="stylesheet" />
+    <link rel="stylesheet"
+        href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.7.0/build/styles/default.min.css">
+    <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.7.0/build/highlight.min.js"></script>
+    <script>hljs.highlightAll();</script>
+    <!-- <style>
+        #basis_dropdown{
+            display: none;
+        }
+        #basis_dropdown li{
+            padding: 0;
+            margin: 0;
+        }
+    </style> -->
+    </script>
+</head>
+
+<body>
+    <header>
+        <h1>Python</h1>
+    </header>
+
+    <nav>
+        <a href="../index.html">Back to home page</a>
+        <ul>
+            <!-- <li id="basis_title">Basis</li>
+            <ul id="basis_dropdown" style="display: none;">
+                <li><a href="#basis_data">Data Types</a></li>
+            </ul> -->
+            <li><a href="#basis">Basis</a></li>
+            <li><a href="#ds">Data Structures</a></li>
+            <li><a href="#numpy">NumPy</a></li>
+            <li><a href="#oop">OOP</a></li>
+            <li><a href="#plt">Matplotlib</a></li>
+        </ul>
+    </nav>
+
+    <!-- <script type="text/javascript">
+        function basis_expand() {
+          let dropdown = document.getElementById("basis_dropdown");
+          if (dropdown.style.display === "none") {
+            dropdown.style.display = "block";
+          } else {
+            dropdown.style.display = "none"
+          }
+        }
+
+        document.getElementById("basis_title").addEventListener("click", basis_expand);
+    </script> -->
+
+    <div id="basis">
+        <h2>Basis</h2>
+        <ul>
+            <li>python variables can be any data type. to cast a variable <code>str(5)</code>. single quotes and double
+                quotes are the same for strings. check the type</li>
+            <li><code>print(...)</code> can either be comma-separated or concat, but you can't concat a number to a
+                string</li>
+            <li>global variable: either do it outside a function, or use the <code>global</code> keyword <br>
+                to change the value of a global variable inside a function, you have to use the <code>global</code>
+                keyword
+            </li>
+            <li>boolean values: None, 0, "", and empty list/set/tuple/dict are <code>False</code></li>
+            <li>some boolean operators
+                <pre><code class="python">is # are the two variables the same objects; is not
+in # is the value present in the object; not in
+isinstance() # check if the variable is of a type, checking inheritance
+type() # check if the variable is of a type, without checking inheritance
+# you shouldn't be using either of them to perform type checking in python</code></pre>
+            </li>
+        </ul>
+
+        <ul>
+            <li>python uses something similar to pass by reference</li>
+            <li> two ways to define a function
+                <pre><code>def myFunc(arg):
+    return arg + 10
+
+# lambda functions 
+myFunc = lambda arg : arg + 10 # lambda arguments : function body
+print(myFunc(5))</code></pre>
+            </li>
+        </ul>
+    </div>
+
+    <div id="ds">
+        <h2>Data Structures</h2>
+        <pre><code>["apple","banana"] # list, ordered, dynamic array implementation
+("apple", "banana") # tuple, immutable list
+{"apple", "banana"} # set, not ordered, no duplicates allowed
+range(6) # range, integers in range(from, to)
+{"name":"apple", "price":10} # dict</code></pre>
+
+        map function:
+        <code>map(function, iterable)</code> applies the function on every element of the iterable
+
+        <h3>lists</h3>
+        <ul>
+            <li>lists cannot be used as keys in dictionaries, have to be converted to tuple</li>
+            <li>list slicing <code>list[start:end:step]</code>with start inclusive and end exclusive; slicing a list
+                returns a copy of it</li>
+            <li>methods on lists
+                <pre><code>insert()
+append() # insert at last index
+extend() # concat two collections together
+remove(item)
+pop(index) # same as remove
+sort() # sorting is in place, this method doesn't return anything
+copy() # deep copy
+index() # return index of an element
+count() # return num of elements with specific value
+# tuple are imutable, some of these methods are not applicable, but mostly the same</code></pre>
+            </li>
+        </ul>
+
+        <h3>dictionaries</h3>
+        <ul>
+            <li>python version of hashmap</li>
+            <li>methods on dictionaries
+                <pre><code>keys()
+values()
+items() # returns a list of key-value pair tuples
+pop(key)
+popitem() # pop the last item
+update() # update a key-value pair</code></pre>
+            </li>
+        </ul>
+
+        <h3>sets</h3>
+        <ul>
+            <li>python version of a hashset, or, a hashmap with only the keys</li>
+            <li>methods on sets
+                <pre><code class="python">add()
+remove()
+"mystr" in myset # check membership, O(1)
+set1 | set2 # union
+set1 & set2 # intersection
+set1 - set2 # diff between the two sets
+# one thing to note is that | and & has lower priority than -, so use parenthese when you do set operations</code></pre>
+            </li>
+        </ul>
+
+        <h3>stack, queue and priority queue</h3>
+        stacks: just use a list as a stack with <code>append()</code> and <code>pop()</code> <br>
+        queue: <code>from collections import dequeue</code> it's a bi-directional queue <br>
+        priority queue: <code>import heapq</code> or <code>from queue import PriorityQueue</code>
+    </div>
+
+    <div id="numpy">
+        <h2>NumPy</h2>
+        Some general rules in numpy: <br>
+        1. in indexing, a comma <code>,</code> means indexing another dimension <br>
+        2. in slicing, a colon <code>:</code> means one of <code>start:end:step</code> <br>
+        3. axis=0 means do the operation row-wise and axis=1 means do the operation column-wise <br>
+
+        <ul>
+            <li>properties of a numpy array
+                <pre><code>np.dtype(object) # the data type of the data contained in this array, should be homogeneous
+np.shape(nparray) # a tuple (axis1, axis2...)
+np.size(nparray) # number of elements, which is the product of the shape
+np.ndim(nparray) # number of axes</code></pre>
+            </li>
+            <li>creating an numpy array
+                <pre><code>np.zeros(10)
+np.ones(10)
+np.empty(10)
+np.array([1,2,3])
+np.arange(start,end,step)
+np.linspace(start,end,num=10) # slice the range between start and end into 10 slices
+rng = np.random.default_rng()
+rng.integers(5, size=(2,4)) # generate random integers in range [0,5) into a nparray of shape (2,4)</code></pre>
+            </li>
+            <li>operations on numpy array shapes
+                <pre><code>np.concatenate((nparray1, nparray2), axis=?) # axis=0 stack these two row-wise, as if adding more rows; axis=1 add these two column-wise, as if appending more columns
+np.hstack() # horizontal stack, same as axis=0
+np.vstack() # vertical stack, same as axis=1
+nparray1.reshape(some shape) # size must match
+nparray.transpose() # same as nparray.T
+nparray.flatten() # flatten an nparray into 1d! if you want other dimension use reshape
+
+</code></pre>
+            </li>
+            <li>arithmatics on numpy array
+                <pre><code>nparray1 + nparray2 # this is NOT concat, this is really adding the values for each entry of the two arrays; similarly you can do - * /
+                    # their shapes have to match, with one exception: adding a single row or column. that single row/column will be expanded into a nparray with the same shape
+min(), max(), sum() # can specify the axis for the operation</code></pre>
+            </li>
+            <li>rubrics
+                <pre><code>sort(nparray)
+np.unique(nparray) # get unique values in an nparray
+nparray2 = nparray1.copy() # deep copy
+nparray[nparray>5] # returns all elements in the array with value greater than 5, regardless of the shape of the array
+np.flip(nparray, axis=?) # flip an array means reversing the elements in the array</code></pre>
+            </li>
+        </ul>
+    </div>
+
+    <div id="oop">
+        <h2>OOP</h2>
+        Everything in python classes are public. <br>
+        More on Python magic methods, <a href="https://rszalski.github.io/magicmethods/">see here</a>
+        <pre><code># skeleton code for a python class
+class MyClass:
+    myProperty = 1
+
+    def __init__(self, propValue): # this is one of the magic methods of Python classes
+        self.myProperty = propValue
+
+    def myMethod():
+        # do something
+
+    def myMethod2(self): # self refers to this object; doesn't have to be self, but must be the first parameter
+        # do something with this object
+
+# inheritance
+class MyChildClass(MyClass):
+    def inheritedMethod1():
+        super().myMethod()
+        # do something else here
+
+# how you would use a python class
+myObject = MyClass(100)
+print(myObject.myProperty)
+myObject.myMethod2()</code></pre>
+    </div>
+
+    <div id="plt">
+        <h2>Matplotlib</h2>
+
+        <h3>Pyplot</h3>
+        You can't really plot a function directly.
+        To plot a function, you have to use numpy to create a list of points and then plot these points. <br>
+        <pre><code>x = np.arange(0,1) 
+y =  np.log(math.comb(100, 40)) # put your function here
+plt.title("Matplotlib demo") 
+plt.xlabel("x axis caption") 
+plt.ylabel("y axis caption") 
+plt.plot(x,y) 
+plt.show()</code></pre>
+    </div>
+</body>
+
+</html>

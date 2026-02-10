@@ -1,0 +1,333 @@
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KX class</title>
+    <link rel="stylesheet" href="../styles/main.css">
+    <link rel="stylesheet" href="../styles/note1.css">
+    <link href="../styles/print.css" media="print" rel="stylesheet" />
+    <link rel="stylesheet"
+        href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.7.0/build/styles/default.min.css">
+    <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.7.0/build/highlight.min.js"></script>
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>
+        MathJax = {
+            tex: { inlineMath: [['$', '$'], ['\\(', '\\)']] }
+        };
+        hljs.registerLanguage('q', q)
+    </script>
+    <script>hljs.highlightAll();</script>
+</head>
+
+<body>
+    <header>
+        <h1>Data Structures</h1>
+    </header>
+
+    <nav>
+        <a href="../index.html">Back to home page</a>
+        <ul>
+            <li><a href="#types">Types</a></li>
+            <li><a href="#lists">Lists</a></li>
+            <li><a href="#strings">Strings</a></li>
+            <li><a href="#dictionaries">Dictionaries</a></li>
+        </ul>
+    </nav>
+
+    <div id="types">
+        <h2>Types</h2>
+        Each type can be represented in two ways: a numeric reference value and a character reference value. <br>
+        e.g., the long type can be represented as -7 or j. <br>
+        To examine the type, use the <code>type</code> function. But when you read the output, only read the numeric not
+        the character:
+        <pre><code class="q">q) type 12345          // returns -7h</code></pre>
+        In the example above, the output -7h indicates that the type of 12345 is long (represented by -7), while the 'h'
+        suffix is for -7 itself you can safely ignore.
+
+        <h3>Nulls and infinities</h3>
+        Nulls are created by padding the type with 0N, and infinities are created by padding the type with 0W. <br>
+        For example, null longs and long infinities are <code>0Nj</code> and <code>0Wj</code> respectively. <br>
+        A generic long without any type can be represented as <code>::</code>. It's usually used as placeholder in
+        functions. <br>
+
+        <h3>Casting</h3>
+        Three ways to do casting with <code>$</code>.
+        <pre><code class="q">
+            q) `float$42    // use symbol name. symbol name for hour is not hour but hh
+            q) "f"$42       // use character name
+            q) 9h$42.       // use numeric name
+        </code></pre>
+        Can also use their functional forms. <br>
+        Special attention needed for symbols and strings:
+        <ul>
+            <li>Only strings can be directly casted into symbols. Other data types must be converted to strings before
+                casting to symbols.</li>
+            <li>When you cast a string, you have to use character name, and you have to use an upper case character.
+                e.g. <code class="q">
+                    "F"$"34.789" 
+                </code>
+            </li>
+            <li>You can cast multiple strings into different types at once.
+                e.g.
+                <pre><code class="q">
+                    q) "SJF*"$"JPM";"100";"4.5";"test string"
+                    `JPM
+                    100
+                    4.5
+                    "test string"
+                </code></pre>
+            </li>
+        </ul>
+
+        <h3>Checking equality</h3>
+        Three ways to check equality:
+        <ol>
+            <li><code>=</code> and its counterparty <code><></code> don't do type checking. They only compare values.
+            </li>
+            <li><code>~</code> this is exact match: not only checks the value but the type as well. It treats a list as
+                a single entity.</li>
+            <li><code>like</code> this is used for string comparison.</li>
+        </ol>
+    </div>
+
+    <div id="list">
+        <h2>List</h2>
+        <h3>Concatenating lists</h3>
+        Easiest way is to use <code>,</code>. <br>
+        <code>enlist</code> is essentially the same as joining an empty list using <code>,</code> for single item lists.
+        <br>
+        But if you use <code>enlist</code> on a 1D list, it'll create a 2D list, whereas <code>,</code> still gives you
+        a 1D list.
+        <pre><code>
+            q) enlist 4             // same as (),4
+            q) enlist 1 2 3         // this returns a 2D list: (1; 2; 3), type 0h
+            q) (),1 2 3             // this returns a 1D list: 1 2 3, type 7h
+        </code></pre>
+
+        <h3>Generating lists</h3>
+        <ul>
+            <li>roll/deal operator <code>?</code> <br>
+                It generates random numbers. The first parameter is the number of random numbers you want, and the
+                second parameter is the range of the random numbers, which can also be a list. <br>
+                <ul>
+                    <li>When you pass a positive number, it's called roll. It samples with replacement.</li>
+                    <li>When you pass a negative number, it's called deal. It samples without replacement.</li>
+                </ul>
+                <pre><code>
+                    q) 10?100      // roll: generates 10 random numbers with replacement   
+                    q) 10?`yes`no  // roll: generates 10 random symbols from a given list
+                    q) -10?100     // deal: generates 10 random numbers without replacement
+                    q) -300?100    // error: cannot draw 300 items from 100 integers without replacement
+                </code></pre>
+            <li>til: this is similar to <code>range()</code> in python, inclusive of 0 but exclusive of the end value.
+                <pre><code>q) til 5     // returns 0 1 2 3 4</code></pre>
+            </li>
+            <li>retrieve a list from a table: <code>tbl`colname</code></li>
+            <li>generate a list from another list
+                <ul>
+                    <li>take: take the first n items. n can be negative. <br>
+                        If you take more than the length of the list, it circles back to the beginning of the list.
+                        <pre><code>q) 3#til 10     // returns 0 1 2</code></pre>
+                    </li>
+                    <li>drop: drops the first n items. n can be negative. <br>
+                        If you drop more than the length of the list, it returns an empty list.
+                        <pre><code>q) 3_til 10     // returns 3 4 5 6 7 8 9</code></pre>
+                    </li>
+                    <li>sublist: a more flexible version that allows you to take not from the beginning of the list, but
+                        from any index. <br>
+                        The syntax is <code>start_index how_many_items sublist L</code>
+                        <pre><code>q) 2 4 sublist til 9  // returns 2 3 4 5; take 4 from index 2</code></pre>
+                    </li>
+                </ul>
+            </li>
+            <li>cut: this cuts a list into a list of sublists of the same length specified by the first parameter.
+                <pre><code>q) 4 cut til 12   // returns (0 1 2 3; 4 5 6 7; 8 9 10 11)</code></pre>
+            </li>
+            <li>enlist: can either create a 1D list from a single element, or a 2D list from a 1D list</li>
+        </ul>
+
+        <h3>Indexing lists</h3>
+        <h4>1D lists</h4>
+        Indexing can be done with or withouth the square brackets <code>[]</code>. <br>
+        If index out of bound, it'll return null of the same data type as the first element in the list. <br>
+        Pay attention though, in kdb DO NOT use negative index. It doesn't work like python.
+        It'll return null instead of returning the element from the end of the list. <br>
+        If you want to achieve similar effect, do this
+        <pre><code>q) L[-2 + count L]</code></pre>
+        If you want to index a list of indices instead of a single element, you can do this:
+        <pre><code>q) @[L; 1 2]</code></pre>
+
+        <h4>2D lists</h4>
+        Indexing a 2D list is also similar to python. <br>
+        You can either do <code>M[i;j]</code> or <code>M[i][j]</code>.
+        If you want a row or a column, it's similar to python slicing. <br>
+        <pre><code>
+            q) M: (1 2 3; 4 5 6; 7 8 9)
+            q) M[1;3]     // returns 6; row 1, column 3
+            q) M[1]       // returns 4 5 6; row 1
+            q) M[;1]      // returns 2 5 8; column 1
+            q) M[1;]      // returns 4 5 6; row 1
+        </code></pre>
+
+        <h3>Searching in a list</h3>
+        Two ways to find in a list: find <code>?</code> and <code>where</code>.
+        To find in a list we use the same operator <code>?</code>. It is called find here not roll, which we used to
+        generate a random list. <br>
+        The key difference is the order of the parameters. For find, the list needs to be the first parameter; but for
+        roll, the list needs to be the second parameter. <br>
+        Another way is to use <code>where</code>. Different from find, we only return the first occurence, where will
+        return all occurences. <br>
+        It's also possible to pass a list to be searched.
+        <pre><code>
+            q) L:10?til 100     // this is roll, generating a list
+            // suppose L is 43 7 56 7 89 5 34 5 23 45
+            q) 5?L              // this is find, finding the first index of 5, which is 5
+            q) where L=5        // this is where, finding all indices of 5, which are 5 and 7
+        </code></pre>
+
+
+        <h3>Modifying lists</h3>
+        The vanilla way to do this is to use the index to assign a new value, like <code>L[2]:99</code>. <br>
+        But if you want to modify a list at multiple indices at once, it's easier to use the <code>@</code> operator.
+        <br>
+        Syntax: <code>@[list; indices; function; args to function]</code> where function can be assign <code>:</code>,
+        or add <code>+</code> ,etc. Only the first two parameters are required. <br>
+        When you pass just the list name as the first parameter, e.g., <code>L</code>, this creates a copy of the list.
+        But when you pass the symbol name with a backtick, e.g., <code>`L</code>, this modify the original list in
+        place. <br>
+        Examples:
+        <ol>
+            <li><b>simple index:</b> <code>@[sampleFares;(2*til 5)]</code>. This returns the 0th, 2th, 4th, 6th, and 8th
+                element.</li>
+            <li><b>assign values at indices: </b> <code>@[sampleFares;(2*til 5);:;99f]</code>. This assigns value
+                <code>99f</code> to the 0th, 2th, 4th, 6th, and 8th element.
+            </li>
+            <li>
+                <b>negating values at all indices:</b> <code>@[sampleFares; ::; neg]</code>
+            </li>
+        </ol>
+        For 2D lists, you need to use <code>.</code> instead of <code>@</code>. <br>
+        Syntax: <code>.[matrix; index at depth; function; args to function]</code> <br>
+        Again both <code>@</code> and <code>.</code> can be used as operators rather than in functional form as we do
+        above. If you use them as operators, the list has to be the second argument.
+
+        <h3>Handling nulls in a list</h3>
+        One way to handle nulls is to use <code>where</code>, but even easier, you can use fill <code>^</code> and
+        <code>fills</code> keywords. <br>
+        Fill need to take a given value to fill the nulls, while fills will use the last non-null value to fill the
+        nulls.
+        <pre><code>
+            // Fill ^ examples
+            q) L: 1 2 0N 0N 3 8 0N
+            q) 0^L          // returns 1 2 0 0 3 8 0; fill nulls with 0
+            q) avg(L)^L     // returns 1 2 3.5 3.5 3 8 3.5; note that avg(L) is 3.5 not 2, nulls are not counted
+            q) L2^L         // fill L with another list L2; L2 must be the same length as L
+            // Fills example
+            q) fills L      // returns 1 2 2 2 3 8 8; fill nulls with the last non-null value
+        </code></pre>
+
+
+        <h3>Handy list functions</h3>
+        <ul>
+            <li><code>except</code>: remove items from a list</li>
+            <li><code>in</code>: check if an item is in a list</li>
+            <li><code>inter</code>: find intersection of two lists. No guarantee that there is no duplicate.</li>
+            <li><code>union</code>: find union of two lists</li>
+            <li><code>distinct</code>: find distinct elements in a list</li>
+        </ul>
+    </div>
+
+    <div id="strings">
+        <h2>Strings</h2>
+        Strings are lists of characters in kdb. So anything that applies to lists also applies to strings. <br>
+        Besides what applies to lists, there are some string-specific functions.
+
+        <h3>Parsing and composing strings</h3>
+        Two functions can be used for this purpose: <code>sv</code> string from vector, and <code>vs</code> vector from
+        string.
+        <pre><code>
+            q) vs[","; "hello,world"]           // split the string at ,
+            "hello"
+            "world"
+            q) sv["|"; ("hello"; "world")]      // put chunks together and glue using |
+            "hello|world"
+        </code></pre>
+        A performance hack is that, if you need to perform the same function on a list of strings, better concatenate
+        them into a long string, perform the function, then split them.
+
+        <h3>Search and replace in strings</h3>
+        If you only want to search, can use <code>ss</code>. <br>
+        If you want to search and replace, can use <code>ssr</code>. The first parameter is the string to be searched,
+        the second parameter is the pattern to be replaced, which can be regex, and the third parameter is the
+        replacement, which can be a function. <br>
+        But pay attention, when you use regex, the wildcard <code>*</code> won't work in either <code>ss</code> or
+        <code>ssr</code>. You need to use <code>?</code> instead.
+        <pre><code>q) ssr["atorb"; "t?r"; upper]        // returns aTORb; regex matches tor, then convert them to upper TOR</code></pre>
+
+        <h3>Common string operations</h3>
+        <ul>
+            <li>trimming strings: three options <code>ltrim</code>, <code>rtrim</code>, and <code>trim</code></li>
+            <li>padding strings: using positive values to pad to the right, and negative values to pad to the left.
+                <pre><code>q) 10$"example"      // pad 3 spaces to the right
+q) -10$"example"     // pad 10 spaces to the left</code></pre>
+                If you pass a value that is less than the length of the string, it extracts a substring.
+            </li>
+            <li>uppercase and lowercase: just use <code>upper</code> and <code>lower</code></li>
+            <li>remove non alphanumeric strings:
+                <pre><code>q) myStr except .Q.nA</code></pre>
+                Here <code>.Q.nA</code> is a predefined list of all non-alphanumeric characters.
+            </li>
+        </ul>
+    </div>
+
+    <div id="dictionaries">
+        <h2>Dictionaries</h2>
+        <h3>Dictionaries</h3>
+        Dictionaries are key-value pairs made of two lists of equal length.
+        <pre><code class="q">
+            q) d: `a`b`c!1 2 3
+            q) d
+            a | 1
+            b | 2
+            c | 3
+
+            // lookup values
+            q) d[`a]          // returns 1
+            q) d `a           // same, not in functional form
+
+            // lookup keys
+            q) d?1            // returns `a
+
+            // modify dictionaries
+            q) d[`a]: 10      // assign new values
+            q) d[`e`f]: 4 5   // add new items
+            q) `a`b _ d       // remove items. Note that there must be a whitespace before the _
+
+            // other handy stuff
+            q) `e`f # d       // extract a subset of items
+            q) d,d2           // upsert d2 into d
+            q) d^d2           // upsert d2 into d, but if the value is null in d2, it'll still use the value in d
+            q) `s#d           // sort d by key
+        </code></pre>
+
+        <h3>Column dictionaries</h3>
+        If the values of a dictionary are lists, then it is called a column dictionary.
+        <pre><code class="q">
+            q) cd: `a`b`c!(1 2 3; 4 5 6; 7 8 9)
+            q) cd
+            a | 1 2 3
+            b | 4 5 6
+            c | 7 8 9
+        </code></pre>
+        Tables are flipped column dictionaries. <br>
+        Keyed table and dictionary share the same type <code>99h</code>. A keyed table is NOT a table, but a
+        dictionary.
+        More details about tables can be found in the <a href="./kxqsql.html">Q SQL section</a>.
+    </div>
+
+</body>
+
+</html>

@@ -1,0 +1,458 @@
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Haskell</title>
+    <link rel="stylesheet" href="../styles/main.css">
+    <link href="../styles/print.css" media="print" rel="stylesheet" />
+    <link rel="stylesheet"
+        href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.7.0/build/styles/default.min.css">
+    <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.7.0/build/highlight.min.js"></script>
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>
+        MathJax = {
+            tex: { inlineMath: [['$', '$'], ['\\(', '\\)']] }
+        };
+        hljs.registerLanguage('haskell', haskell)
+    </script>
+    <script>hljs.highlightAll();</script>
+    <style>
+        #basis_dropdown {
+            display: none;
+        }
+
+        #basis_dropdown li {
+            padding: 0;
+            margin: 0;
+        }
+
+        .blue_font {
+            color: blue;
+        }
+    </style>
+    </script>
+</head>
+
+<body>
+    <header>
+        <h1>Haskell</h1>
+    </header>
+
+    <nav>
+        <a href="../index.html">Back to home page</a>
+        <ul>
+            <li><a href="#env">Env</a></li>
+            <li><a href="#principle">Principles</a></li>
+            <li id="basis_title">Basis</li>
+            <ul id="basis_dropdown" style="display: none;">
+                <li><a href="#basis_list">Lists</a></li>
+                <li><a href="#basis_tuple">Tuples</a></li>
+            </ul>
+            <li><a href="#types">Types</a></li>
+            <li><a href="#modules">Modules</a></li>
+            <li><a href="#func">Functions</a></li>
+        </ul>
+    </nav>
+
+    <script type="text/javascript">
+        function basis_expand() {
+            let dropdown = document.getElementById("basis_dropdown");
+            if (dropdown.style.display === "none") {
+                dropdown.style.display = "block";
+            } else {
+                dropdown.style.display = "none"
+            }
+        }
+
+        document.getElementById("basis_title").addEventListener("click", basis_expand);
+    </script>
+
+    <div>
+        OK, this page is indeed beginner friendly because I'm also pretty new to Haskell. <br>
+        But I guess by beginner I mean beginner to functional programming, NOT beginner to programming as a whole.
+    </div>
+
+    <div id="env">
+        <h2>Environment Related</h2>
+
+        Steps to step to set up the env on a Mac with Intel chip: follow <a
+            href="https://www.haskell.org/ghcup/steps/">this guide</a> <br>
+        Several ways to compile and run:
+        <ul>
+            <li>the CML way: <code>runghc -Wall hello.hs -fforce-recomp</code>; run the code, with warning</li>
+            <li>the interactive way: <code>ghci</code>; load a file using <code>load hello.hs</code></li>
+            <li>stack: I personally prefer this one; edit the code with highlighting in vscode then compile and run with
+                stack. Some commands:
+                <ul>
+                    <li><code>stack new proj-name template-name</code>: cannot have underscore in the project name;
+                        <code>new-template</code> by default for template if you don't specify one
+                    </li>
+                    <li><code>stack build</code>: compiles and produces an executable <code>proj-name-exe</code>; this
+                        executable is hidden in the document tree</li>
+                    <li><code>stack exec proj-name-exe</code>: run the executable</li>
+                    <li><code>stack test</code>: run the test suite</li>
+                    <li><code>stack clean</code>: clean compiler output (in <code>.stack-work/dist</code>)</li>
+                    <li><code>stack purge</code>: revert the project to a clean state; a throrough cleaning...</li>
+                    <li><code>stack init</code>: creating the <code>stack.yaml</code> file</li>
+                </ul>
+            </li>
+        </ul>
+        document tree of stack
+        <ul>
+            <li><code>app/Main.hs</code>: entrypoint</li>
+            <li><code>src/Lib.hs</code>: libs</li>
+            <li><code>test/Spec.hs</code>: test code</li>
+            <li><code>Setup.hs</code>: configuration for cabal</li>
+            <li><code>helloworld.cabal</code>: automatically updated for cabal</li>
+            <li><code>package.yaml</code>: generates a cabal file, which you should NOT modify; specify dependencies
+                here</li>
+            <li><code>stack.yaml</code>: configuration file for stack; <code>resolver</code>: compiler settings,
+                <code>packages</code>: local package path
+            </li>
+            <li><code>README.md</code>, <code>.gitignore</code>, <code>ChangeLog.md</code> and <code>LICENSE</code></li>
+        </ul>
+    </div>
+
+    <div id="principle">
+        <h2>Principles</h2>
+        <ul>
+            <li>Principles of functional programming
+                <ul>
+                    <li>function is first class: functions themselves are values</li>
+                    <li>Haskell programs is centered around evaluating expressions rather than executing instructions
+                    </li>
+                    <li>indentation matters: if you indent more it'll just be added to the previous line; if you indent
+                        less the block is terminated</li>
+                </ul>
+            </li>
+            <li>
+                Principles of Haskell
+                <ul>
+                    <li><span class="highlight_yellow">everything is immutable</span>; think of variables not as boxes
+                        but as unique names for values <br>
+                        e.g. <code>x=7</code> means "define x to be 7" <br>
+                        e.g. <code>x=7 y=x+5</code> when you change the value of x, the value of y stays the same</li>
+                    <li><span class="highlight_yellow">no side effect</span> so parallelism is possible</li>
+                    <li><span class="highlight_yellow">lazy</span>: things are not evaluated until their results are
+                        needed</li>
+                    <li><span class="highlight_yellow">statically typed</span>: types must match for haskell
+                        expressions; there is NO implicit type conversion in haskell <br>
+                        <code>"somestr"==5</code> yields an error
+                    </li>
+                    <li>names in haskell can't start with uppercase letters; <code>_</code> alone is a placeholder</li>
+                </ul>
+            </li>
+            <li>
+                Data types: <code>Int, Integer, Bool, Double, Char, String</code>: <code>String</code> is equivalent to
+                <code>[Char]</code>
+            </li>
+            <li>
+                Good practices:
+                <ul>
+                    <li>top-level type declaration for every function: e.g. <code>add :: Int -> Int -> Int</code></li>
+                </ul>
+            </li>
+            <li>
+                Haskell vs imperative languages
+                <ul>
+                    <li>Declare things in term of WHAT it is instead of HOW to get it.</li>
+                </ul>
+            </li>
+        </ul>
+    </div>
+
+    <div id="basis">
+        <h2>Basis</h2>
+        <h3 id="basis_list">Lists</h3>
+        lists in haskell are singular linked lists. Only elements of the same data type are allowed to be in the same
+        list. <br>
+        But this is allowed because it's a list of lists: <code>[[1,2],[8,11,5],[4,5]]</code>
+        <ul>
+            <li>create a list: note that when you create a list you always do a deep copy
+                <ul>
+                    <li><code>mylist = [1,2,3]</code></li>
+                    <li>using the <code>cons</code> operator: takes one element and a list
+                        e.g. <code>1:2:3:[]</code> yields <code>[1,2,3]</code></li>
+                    <li>using the <code>++</code> operator: takes two lists; think concat two linked list, the first
+                        list is traversed <br>
+                        e.g. <code>["a","b","c"] ++ "de"</code> </li>
+                    <li>using list ranges <code>..</code>: only works on integers and chars <br>
+                        e.g. <code>[1..20]</code> <br>
+                        e.g. <code>[1..]</code> this is an infinite list, don't print out the whole thing, use
+                        <code>take</code>
+                    </li>
+                    <li>create a cyclic list: <code>cycle, repeat, replicate</code><br>
+                        e.g. <code>cycle [1,2,3]</code><br>
+                        e.g. <code>repeat 5</code><br>: you get an infinite list of 5s <br>
+                        e.g. <code>replicate 15 6</code>: you get fifteen 6s
+                    </li>
+                </ul>
+            </li>
+            <li>operations on a list:
+                <code>head, tail, init, last, length, reverse, take, drop, maximum, minimum, sum, product, elem</code>
+                <br>
+                some of these operations are expensive don't use them
+            </li>
+            <li>list comprehensions: these are pretty much like sets definition in math; can have multiple guards
+                and
+                generators<br>
+                e.g. <code>[x*2 | x &lt- [1..10]]</code> this is equivalent to the set $\{x*2 \mid x \in \mathbb{N}
+                \text{ and } x \in [1,10]\}$ <br>
+                e.g. <code>[ x | x &lt- [1..100], x `mod` 7 == 0, x `mod` 5 == 0 ]</code> multiple guards <br>
+                e.g. <code>[ x + y | x &lt- [100,200..400], y &lt- [0..3] ]</code> multiple generators, applies
+                right to
+                left <br>
+                <span class="blue_font">note that if you use let bindings in list comprehension, whatever defined in
+                    let
+                    is only visible to things on the left hand side of it</span>
+            </li>
+        </ul>
+
+        <h3 id="basis_tuple">Tuples</h3>
+        Tuples are not homogenous, meaning they can contain multiple data types.
+        <ul>
+            <li>create a tuple
+                <ul>
+                    <li><code>mytuple = (1, "hello")</code></li>
+                    <li><code>zip</code> two lists: the shorter list dominates <br>
+                        e.g. <code>zip "Stephen" [1..]</code> yields
+                        <code>[('S',1),('t',2),('e',3),('p',4),('h',5),('e',6),('n',7)]</code>
+                    </li>
+                </ul>
+            </li>
+        </ul>
+    </div>
+
+    <div id="types">
+        <h2>Types</h2>
+        Haskell is statically typed, meaning that the type of every expression is known at compile time. <br>
+        Haskell uses type inference, so you don't have to explicitly specify the type of every expression. <br>
+        <br>
+        For functions, the return value is the last type in its type declaration. <br>
+        <br>
+        Type annotation: <code>read "5" :: Int</code> <br>
+        Specify the type of an expression explicitly by adding <code>::</code> after it. <br>
+        <br>
+        <b>Type variables:</b> <br>
+        <code>head :: [a] -> a</code> <br>
+        The <code>a</code> here is a type variable, meaning it can be of any type. Similarly there can be <code>b</code>
+        etc.<br>
+        Within the same type signature, if you use the same type variable, it means that the two types are the same.
+        <br>
+        Functions that have type variables are called polymorphic functions. <br>
+        <br>
+        <b>Type classes:</b> <br>
+        Type classes are like interfaces in Java. <br>
+        <code>(==) :: (Eq a) => a -> a -> Bool</code> <br>
+        Everything before <code>=></code> is called a class constraint.
+        You can regard it as some constraint imposed on the type variable <code>a</code>.
+        In our case, the type constraint specifies that <code>a</code> must be a type that belongs to the
+        <code>Eq</code> type class,
+        which is essentially an interface to test for equality. <br>
+        Everything after <code>=></code> can be intepreted the same way as you did for function. <br>
+        Some basic type classes:
+        <ul>
+            <li><code>Eq, Ord</code>: type classes that allow you to check if two values are equal or if one is greater
+                than the other <br> Note that <code>Num</code> isn't a subclass of <code>Ord</code></li>
+            <li><code>Enum, Bounded</code>: check if members in this collection can be sorted or if members in this
+                collection are bounded</li>
+            <li><code>Show, Read</code>: similar to <code>toString()</code> and its opposite, e.g.
+                <code>parseInt()</code> in Java.
+            </li>
+            <li>Numeric value related:
+                <ul>
+                    <li><code>Num</code>: all numeric values that allows you to perform arithmetics.</li>
+                    <li><code>Integral</code>: two types <code>Int</code> and <code>Integer</code></li>
+                    <li><code>Floating</code>: two types <code>Float</code> and <code>Double</code></li>
+                    <li><code>splitAt</code>: split at index</li>
+                    <li><code>sort</code></li>
+                    <li><code>group</code>: group the same element into sublists</li>
+                </ul>
+            </li>
+        </ul>
+        <br>
+        <b>User-defined Types</b><br>
+        <code>data Bool = False | True</code> <br>
+    </div>
+
+    <div id="modules">
+        <h2>Modules</h2>
+        Haskell modules;
+        <ul>
+            <li><code>Data.List</code>
+                <ul>
+                    <li><code>concat</code>: flattens out a list</li>
+                    <li><code>transpose</code>: transpose a 2D matrix</li>
+                    <li><code>any</code>: if any element of the list satisfies the predicate</li>
+                </ul>
+            </li>
+            <li><code>Data.Char</code>
+                <ul>
+                    <li>check whether a character is a letter/number...</li>
+                    <li>change a character to upper/to lower...</li>
+                </ul>
+            </li>
+            <li>
+                <code>Data.Map</code>
+                key-value pairs
+            </li>
+            <li>
+                <code>Data.Set</code>
+                set
+            </li>
+        </ul>
+
+        User-defined modules:
+        <pre><code>-- in Geometry.hs
+module Geometry
+( sphereVolume
+, sphereArea
+, squareArea
+, squareVolume) where
+-- define the functions here
+
+
+-- in Sphere.hs
+module Geometry.Sphere
+( volume
+, area) where
+-- define the functions here</code></pre>
+    </div>
+
+    <div id="func">
+        <h2>Functions</h2>
+        Function data type: with multiple arguments, functions are actually function that returns functions that returns
+        functions...each of these functions is a single argument function
+        <h3>Call a function</h3>
+        <ul>
+            <li>function calls have higher precedence than all other operations, it'll use the following values as the
+                argument once it receives it. <br>
+                e.g. <code>succ 9 + max 5 4 + 1</code> yields <code>16</code>
+            </li>
+            <li>backticks enables you to use function as an infix operator <br>
+                e.g. <code>15 `max` 16</code> is the same as <code>max 15 16</code>
+            </li>
+            <li>
+                parenthesis enables you to use a binary operator as a function <br>
+                e.g. <code>(+) 15 16</code> is the same as <code>15 + 16</code>
+            </li>
+            <li>
+                function application w/ <code>$</code>: to get rid of parenthesis because it has the lowest precedence.
+                <br>
+                e.g. <code>sqrt (3 + 4 + 9)</code> is the same as <code>sqrt $ 3 + 4 + 9</code>
+            </li>
+            <li>
+                function composition w/ <code>.</code>: pretty much like function composition in math<br>
+                e.g. <code>map (\x -> negate (abs x)) [5,-3,-6,7]</code> is the same as <code>map (negate .
+                    abs) [5,-3,-6,7]</code>
+            </li>
+        </ul>
+        <h3>Define a function</h3>
+        <ul>
+            not that there is no return statement in haskell; every function in haskell must return something
+            <li>simple function <br>
+                e.g. <code>area a b = a * b</code></li>
+            <li><code>let...in</code> function: <br>
+                e.g.
+                <code>cylinder r h = <b>let</b> sideArea = 2 * pi * r * h topArea = pi * r^2 <b>in</b> sideArea + 2 * topArea</code>
+            </li>
+            <li><code>where</code> function: <br>
+                e.g.
+                <code>cylinder r h = sideArea + 2 * topArea <b>where</b> sideArea = 2 * pi * r * h topArea = pi * r^2</code>
+                <br>
+                <span class="blue_font">diff between let bindings and where bindings: <br>let bindings are expressions
+                    themselves. where bindings are syntactic constructs.
+                    <br> This means that let bindings can be used anywhere (they return a value), but where bindings can
+                    only be used in the function they are defined in.
+                    <br></span>
+            </li>
+
+            <li>pattern matching: note that patterns are evaluated in order, so put specific first <br>
+                <code>digitToStr :: Integral a => a -> String <br> digitToStr 1 = "One" <br> digitToStr _ = "Other numbers"</code>
+                <br>
+                equivalently, you can do case matching <br>
+                <code>digitToStr :: Integral a => a -> String <br> digitToStr x = case x of 1 -> "One" _ -> "Other numbers" </code>
+            </li>
+        </ul>
+
+        <h3>Guards</h3>
+        <pre><code>bmiTell :: (RealFloat a) => a -> String <br>
+bmiTell bmi <b>|</b> bmi &lt= 18.5 = "Underweight" <br>
+<b>|</b> bmi &lt= 25.0 = "Normal" <br>
+<b>|</b> otherwise = "Overweight"</code></pre>
+
+        <h3>Recursion</h3>
+        <pre><code>factorial :: (Eq a, Num a) => a -> a
+factorial 0 = 1 <br>
+factorial n = n * factorial (n - 1)</code></pre>
+
+        <h3>Higher order functions</h3>
+        Higher order function refers to the fact that functions can be used as parameters and return values. <br>
+        Example that function can be used as a return value: <br>
+        <pre><code>max :: (Ord a) => a -> a -> a 
+-- essentially the same as 
+max :: (Ord a) => a -> (a -> a)</code></pre>
+        Two ways to interpret this: <br>
+        1. <code>max</code> takes two parameters and returns a value of the same type <br>
+        2. <code>max</code> takes one parameter and returns a function that takes one parameter and returns a value of
+        the same type -> function application happens to the closest argument <br>
+        <br>
+        Example that function can be used as a parameter: <br>
+        <pre><code>applyTwice :: (a -> a) -> a -> a
+applyTwice f x = f (f x)</code></pre>
+        Notice the type declaration: <code>(a -> a)</code> is the type of a function. The parenthesis cannot be omitted
+        because <code>-></code> is right associative. <br>
+
+        <h3>Some standard prelude functions commonly used</h3>
+        <ul>
+            <li><code>filter :: (a -> Bool) -> [a] -> [a]</code>:
+                <br>takes a boolean function (called a predicate) and a list and returns a
+                list that is filtered based on the predicate.
+            </li>
+            <li>
+                <code>takeWhile :: (a -> Bool) -> [a] -> [a]</code>:
+                <br>takes a predicate and a list and returns a list that is taken from the original list until the first
+                element that doesn't satisfy the predicate.
+            </li>
+            <li><code>compare :: Ord a => a -> a -> Ordering</code>:
+                <br>takes two parameters that can be ordered(belong to the type class Ord) and return an ordering.
+            </li>
+            <li><code>zip :: [a] -> [b] -> [(a, b)]</code>:
+                <br>takes two lists and combine the two lists into a new list made of tuples of elements from the two
+                lists.
+            </li>
+            <li><code>zipWith :: (a -> b -> c) -> [a] -> [b] -> [c]</code>:
+                <br>takes three parameters: (1) a function
+                that takes two parameters a and b, (2) a list of a, and (3) a list of b. returns a list of c where each
+                c is the result acquired from applying the function on a and b.
+            </li>
+            <li>
+                <code>map :: (a -> b) -> [a] -> [b]</code>:
+                <br>takes a function and a list and returns a list where each element is the result of applying the
+                function on the corresponding element in the original list.
+            </li>
+            <li>
+                fold is a common pattern in haskell. <br>
+                It takes a binary function, a starting value, and a list to fold up. A binary function takes two
+                parameters. The binary function is applied to the starting value to acquire a new starting value, and
+                this process repeats until the list is exhausted.
+                <ul>
+                    <li>
+                        <code>foldl :: Foldable t => (b -> a -> b) -> b -> t a -> b</code>:
+                        <br>folds from the let. takes a function that takes two parameters and returns a function that
+                        takes a list and returns a value.
+                    </li>
+                    <li>
+                        <code>scanl :: (b -> a -> b) -> b -> [a] -> [b]</code>:
+                        <br>similar to <code>foldl</code> but returns a list of all the intermediate values.
+                    </li>
+                </ul>
+            </li>
+        </ul>
+    </div>
+</body>
+
+</html>

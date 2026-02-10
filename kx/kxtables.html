@@ -1,0 +1,384 @@
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KX class</title>
+    <link rel="stylesheet" href="../styles/main.css">
+    <link rel="stylesheet" href="../styles/note1.css">
+    <link href="../styles/print.css" media="print" rel="stylesheet" />
+    <link rel="stylesheet"
+        href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.7.0/build/styles/default.min.css">
+    <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.7.0/build/highlight.min.js"></script>
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>
+        MathJax = {
+            tex: { inlineMath: [['$', '$'], ['\\(', '\\)']] }
+        };
+        hljs.registerLanguage('q', q)
+    </script>
+    <script>hljs.highlightAll();</script>
+</head>
+
+<body>
+    <header>
+        <h1>Tables</h1>
+    </header>
+
+    <nav>
+        <a href="../index.html">Back to home page</a>
+        <ul>
+            <li><a href="#tables">Tables</a></li>
+            <li><a href="#attributes">Attributes</a></li>
+            <li><a href="#joins">Joins</a></li>
+        </ul>
+    </nav>
+
+    <div id="tables">
+        <h2>Tables</h2>
+        There are two types of tables, keyed and unkeyed.
+        <pre><code>
+            // creating tables
+            t1:([]sym:`$();price:float$();size:long$())                                 // empty typed table
+            t2:([]sym:enlist `AAPL;price:enlist 100.0;size:enlist 100)                  // single items must be enlisted
+            t3:([]sym:`AAPL`GOOG;price:100.0 89.0;size:100 120)                         // unkeyed table
+            t4:([sym:`AAPL`GOOG]price:100.0 89.0;size:100 120)                          // keyed table
+
+            // key and unkey
+            `sym xkey t3                                                                // key method 1: use xkey; here we key on sym
+            t2!t3                                                                       // key method 2: use !; all columns in tbl1 will be used as key in the joined table
+            () xkey t4                                                                  // unkey method 1: use xkey with empty list
+            0!t4                                                                        // unkey method 2: use ! with 0
+
+            // indexing tables
+            t2[`size]                                                                   // index a column
+            t2[0]                                                                       // index a row
+            t2[0 1;`size]                                                               // unkeyed table, index by row, then by column
+            t2[`size][0 1]                                                              // unkeyed table, alternatively, index by column, then by row
+            t4[([]sym: `AAPL`GOOG); `size]                                              // keyed table, index by key, then by column
+
+            // insert: three ways, list, VALUE of dictionary, table
+            `t1 insert (`TSLA`IBM; 88.1 89.5; 100 200)                                  // insert a list of rows
+            `t1 insert value `sym`price`size!((`MSFT;`TSLA); (98.1; 88.1); (200; 100))  // insert the VALUE of a dictionary (not the dictionary itself!!)
+            `t1 insert ([]sym:`AAPL;price:100.0;size:100)                               // insert a table
+
+            // upsert: same as insert for unkeyed tables; for keyed tables, if the key already exists, it'll update the row, otherwise it errors
+            // also there are some nuances when it comes to usage
+            `t4 upsert ((`AAPL; 101.0; 101); (`GOOG; 88.0; 100))                        // upsert a list of rows ROW BY ROW
+            `t4 upsert flip value `sym`price`size!(`MSFT`TSLA; 98.1 88.1; 200 100)      // upsert the FLIPPED VALUE of a dictionary
+            `t4 upsert ([]sym:`AAPL;price:100.0;size:100)                               // upsert a table
+        </code></pre>
+    </div>
+
+    <div id="attributes">
+        <h2>Attributes</h2>
+        <ul>
+            <li>Attributes are used on lists or columns of a table. </li>
+            <li>Attributes are not enforced properties on the list; they are merely metadata that describe the list if
+                it exhibits certain properties. If the list does not maintain the properties, the attribute will be
+                lost. <br>
+                For example, if you try to apply sorted attribute on an unsorted list, it won't work. And if a sorted
+                list is no longer sorted, the attribute will be lost. </li>
+            <li>One list can only have one attribute at a time. Applying a new attribute will overwrite the existing
+                one.</li>
+            <li>Attributes can improve performance of queries.</li>
+        </ul>
+
+        To check what attribute is applied to a list, use <code>attr</code>.
+        <pre><code>
+        q) attr asc 1 2 3 4
+        `s
+        q) attr 1 2 3
+        // returns nothing because by default there is no attribute, even it looks sorted to humans
+        </code></pre>
+
+        To apply an attribute to a list, there are several ways:
+        <ul>
+            <li>Some built in function automatically applies some attribute for you, like <code>asc</code> above.</li>
+            <li>Explicitly apply it using the <code>`x#</code> syntax, where <code>x</code> is the attribute. e.g.,
+                <code>`s#til 5</code>
+            </li>
+            <li>Use <code>@</code> for lists, e.g., <code>@[`s#; l]</code></li>
+        </ul>
+        To remove an attribute, simply do <code>`#</code> on the list with an empty symbol.
+        For example, <code>`# asc 1 2 3 4</code>
+
+        <h3>Summary</h3>
+        <table>
+            <tr>
+                <th>Attribute</th>
+                <th>Purpose</th>
+                <th>Requirement</th>
+                <th>Space</th>
+                <th>Example good</th>
+                <th>Example fail</th>
+            </tr>
+            <tr>
+                <td>sorted</td>
+                <td>allow binary search</td>
+                <td>list in ascending order</td>
+                <td>none</td>
+                <td><code>`s#til 5</code></td>
+                <td><code>`s#5 4 3 2 1</code></td>
+            </tr>
+            <tr>
+                <td>unique</td>
+                <td>store as dictionary</td>
+                <td>list has no duplicates</td>
+                <td>large</td>
+                <td><code>`u#1 2 3</code></td>
+                <td><code>`u#1 2 3 2</code></td>
+            </tr>
+            <tr>
+                <td>parted</td>
+                <td>store as dictionary of arrays</td>
+                <td>identical items in the list are stored together</td>
+                <td>small</td>
+                <td><code>`p#1 2 2 3 4</code></td>
+                <td><code>`p#2 1 2 3 4</code></td>
+            </tr>
+            <tr>
+                <td>grouped</td>
+                <td>store as dictionary of dynamic arrays</td>
+                <td>none</td>
+                <td>very large</td>
+                <td><code>`g#2 1 2 3 4</code></td>
+                <td>n/a</td>
+            </tr>
+        </table>
+
+        <h3>Sorted</h3>
+        This is in general for all attributes that have certain requirements: if you modify a list, you must modify in
+        place. You MUST NOT create a copy of the list. In creating the copy the attribute will be lost. <br>
+        Using sorted as an example:
+        <pre><code>
+            q) sortedList: `s#til 5
+            q) sortedList,6     // create a copy; this will FAIL even if the list looks sorted to humans
+            q) sortedList,:6    // modify in place
+        </code></pre>
+        You can think of the syntax as <code>+=</code> in python. <br>
+        By default, operations in kdb like <code>upsert</code> and <code>insert</code> preserve this attribute.
+
+        <h3>Unique</h3>
+        This is essentially a dictionary. <br>
+        It's very fast, but takes up a lot of space. Meanwhile, you can't have duplicate keys. <br>
+        Therefore only use it on very small tables.
+
+        <h3>Parted</h3>
+        If we really want to have duplicate keys, what can we do? <br>
+        This is like a dictionary of arrays with fixed sizes. Each key points to an array of locations that stores the
+        same value. <br>
+        Under the hood something like this is happening:
+        <pre><code>
+            q) `p#`A`A`B`C`C`C
+            // just an idea of what's going on, not really how kdb implements it
+            `A (starts at 0, length 2)
+            `B (starts at 2, length 1)
+            `C (starts at 3, length 3)
+        </code></pre>
+        Because underlying data is stored contiguously, it's very fast. <br>
+        However it comes with a drawback: you need to know the size in advance. ie, you need to make sure the same
+        values are stored together. <br>
+        This is why this attribute is almost exclusively used in hdbs.
+
+        <h3>Grouped</h3>
+        This attribute tries to solve both the drawbacks of unique and parted. <br>
+        It's like a dictionary of lists. You don't need to know the size in advance, and you can have duplicate keys,
+        but as a tradeoff, you need extra space to remember the index of each value.
+        <pre><code>
+            q) group "mississippi"
+            // this is the real implementation
+            m| ,0
+            i| 1 4 7 10
+            s| 2 3 5 6
+            p| 8 9
+        </code></pre>
+
+    </div>
+
+    <div id="joins">
+        <h2>Joins</h2>
+        <h3>Simple row joins</h3>
+        Use <code>,</code>. This is similar to how <code>insert</code> works. <br>
+        This type of join won't perform type checks. As long as the number of columns matches, it will perform the join.
+        <pre><code>q) t1,t2</code></pre>
+
+        <h3>Simple column joins</h3>
+        Use <code>,'</code>. This is similar to how <code>upsert</code> works. <br>
+        Again this type of join won't perform type checks. As long as the number of rows matches, it will perform the
+        join. <br>
+        If the column already exists inth e original table, the table on the right will overwrite that column.
+        <pre><code>q) t1,'t2</code></pre>
+
+        <h3>Table joins</h3>
+        Multiple types of joins - we can seperate them into three types. <br>
+
+        The first type is left join <code>lj</code>, inner join <code>ij</code> and their variants.
+        <ul>
+            <li>left join: requires table on the right to be keyed.
+                <pre><code>q) lj[unkeyed or keyed; keyed]</code></pre>
+                lj will attempt to match the keys of the RHS table. a record must contain ALL same keys to be considered
+                a match. <br>
+                once a match is found, it'll do three things
+                <ul>
+                    <li>if a column exists in RHS but not LHS, append this column</li>
+                    <li>if a column exists in LHS but not RHS, keep this column as is</li>
+                    <li>if a column exists in both LHS and RHS, update this column using RHS value</li>
+                </ul>
+            </li>
+            <li>
+                inner join: requires table on the right to be keyed.
+                <pre><code>q) ij[unkeyed or keyed; keyed]</code></pre>
+            </li>
+            <li>
+                plus join: variant of left join; updates the value with the sum.
+                <pre><code>q) pj[unkeyed or keyed; keyed]</code></pre>
+                if a match is found, it'll do these things
+                <ul>
+                    <li>if a column exists in RHS but not LHS, append this column</li>
+                    <li>if a column exists in LHS but not RHS, keep this column as is</li>
+                    <li>if a column exists in both LHS and RHS, update this column using the sum of LHS and RHS
+                        value</li>
+                </ul>
+            </li>
+            <li>
+                equal join: variant of inner join. <br>
+                It performs column matching on multiple columns, not just the keys, so neither table needs to be keyed.
+                <pre><code>q) ej[colsToMatch; t1; t2]</code></pre>
+                note that, if <code>colsToMatch</code> are the same as keys in the RHS table in <code>ij</code>, the two
+                queries will return the same result.
+            </li>
+        </ul>
+
+        The second type is union join <code>uj</code>. <br>
+        Union join is a very general type of join that returns the union of two tables, meaning all records from both
+        tables. <br>
+        When you perform union joins, neither table needs to be keyed. <br>
+        <br>
+        The third type is time-series based joins, as-of join <code>aj</code> and window join <code>wj</code>.
+        <ul>
+            <li>as-of joins: use <code>aj</code> when you want to join two tables based on some column and time, and you
+                want to join based on the last time record. <br>
+                syntax:
+                <pre><code>aj[c;t1;t2]</code></pre>
+                where
+                <ul>
+                    <li>t1 is a table</li>
+                    <li>t2 is a table, usually a simple table, ideally sorted</li>
+                    <li>c is a symbol list of column names to join on, and the last column is a sortable type, typically
+                        time</li>
+                </ul>
+                example: <br>
+                <pre><code class="q">aj[`sym`time; trades; quotes]</code></pre>
+                This joins the <code>trades</code> table with the <code>quotes</code> table on the <code>sym</code>
+                column, and then for the <code>time</code> column, here is what it does:
+                for each <code>time</code> value in <code>trades</code>, it finds the last <code>time</code> value in
+                <code>quotes</code> that is less than or equal to the <code>time</code> value in <code>trades</code>.
+                <br>
+                For example, if the <code>trades</code> table has a <code>time</code> value of 10:00:00, and the
+                <code>quotes</code> table has a <code>time</code> value of 9:59:00, 10:00:00, and 10:01:00, then the
+                <code>aj</code> function will return the <code>quotes</code> table with the <code>time</code> value of
+                9:59:00. <br>
+                If you get a <code>`rank</code> error when using <code>aj</code>, likely in <code>t2</code> you have too
+                few columns.
+                It can't only contain the columns in <code>c</code> that you want to perform the join on.
+            </li>
+            <li>
+                window join: generic version of as-of join.
+                <pre><code>wj[w; c; t1; (t2; (f0;c0); (f1;c1))]</code></pre>
+                where
+                <ul>
+                    <li>w is a two-item list specifying how much time before and after to look at <br>
+                        The time window can be generated two ways
+                        <pre><code>
+                            // w1: 2 min before and 2 min after
+                            w1: (st1.time-2; st1.time+2)
+                            // w2: 10 min before and 20 min after
+                            w2: -10 20+\: st1[`time]
+                        </code></pre>
+                        Depending on what data type is your time column, you may need to add or subtract different
+                        things. <br>
+                        In the example above the data type is minute, so only integers are allowed. If it's timestamp,
+                        then you'll need to add or subtract timespans like
+                        <code>(st1.time-00:02:00 st1.time+00:02:00)</code>
+                    </li>
+                    <li>c is a symbol list of column names to join on, and the last column is a sortable type, typically
+                        time</li>
+                    <li>t1 is a table, sorted</li>
+                    <li>t2 is a table, sorted</li>
+                    <li>(f0;c0) and (f1;c1) are aggregations applied on columns; examples are
+                        <ul>
+                            <li>(avg; `price)</li>
+                            <li>(min; `bid)</li>
+                            <li>(max; `ask)</li>
+                            <li>(sum; `size)</li>
+                            <li>(first; `px)</li>
+                            <li>(last; `px)</li>
+                            <li>(::; `px) this is called identify function, it returns the original value</li>
+                        </ul>
+                    </li>
+                </ul>
+
+            </li>
+        </ul>
+
+        <h3>Join Examples</h3>
+        <pre><code>
+            q) t1:([] sym:`A`A`B`C; id:1 2 3 4; qty:10 20 30 40; time:09:59 10:00 10:01 10:02)
+            q) t2:([] sym:`A`B`B`D; id:1 3 5 6; px:100 200 210 300; time:09:58 10:00 10:03 10:01)
+            
+            // trade table                      // quote table
+            sym id qty time                     sym id px time
+            -----------------                   -----------------
+            A   1  10  09:59                    A   1  100 09:58
+            A   2  20  10:00                    B   3  200 10:00
+            B   3  30  10:01                    B   5  210 10:03
+            C   4  40  10:02                    D   6  300 10:01
+        </code></pre>
+        Left join, inner join, plus join, equal join:
+        <pre><code>
+            // If we only key on sym
+            q) kt2:`sym`id xkey t2 
+            // left join                  // inner join                 // plus join on id            // equal join on sym
+            q) lj[t1; kt2]                q) ij[t1; kt2]                q) pj[t1; kt2]                q) ej[`sym; t1; t2]
+            sym id qty time  px           sym id qty time px            sym id qty time  px           sym id qty time  px  
+            -----------------------       --------------------          --------------------          ---------------------
+            A   1  10  09:58 100          A   1  10  09:58 100          A   2  10  19:57 100          A   1  10  09:58 100 
+            A   1  20  09:58 100          A   1  20  09:58 100          A   3  20  19:58 100          A   1  20  09:58 100
+            B   3  30  10:00 200          B   3  30  10:00 200          B   6  30  20:01 200          B   3  30  10:00 200
+            C   4  40  10:02                                            C   4  40  10:02 0
+
+            // If we key on both sym and id, ie. both sym and id need to match
+            q) kt2:`sym`id xkey t2 
+            // left join                  // inner join                 // plus join on id            // equal join on sym and id
+            q) lj[t1; kt2]                q) ij[t1; kt2]                q) pj[t1; kt2]                q) ej[`sym`id; t1; t2]
+            sym id qty time  px           sym id qty time px            sym id qty time  px           sym id qty time  px  
+            -----------------------       --------------------          --------------------          ---------------------
+            A   1  10  09:58 100          A   1  10  9:58  100          A   1  10  19:57 100          A   1  10  09:58 100 
+            A   2  20  10:00              B   3  30  10:00 200          A   2  20  10:00 0            B   3  30  10:00 200
+            B   3  30  10:00 200                                        B   3  30  20:01 200
+            C   4  40  10:02                                            C   4  40  10:02 0
+        </code></pre>
+        Union join, as-of join, window join:
+        <pre><code> 
+            q) st2: `sym`time xasc t2
+            // union join                       // as-of join                   // window join 
+            q) uj[t1; t2]                       q) aj[`sym`time; t1; st2]       q) w:(t1.time-2; t1.time+2) // range from 09:59-2 to 10:02+2
+            sym id qty time  px                 sym id qty time  px             09:57 09:58 09:59 10:00
+            -----------------------------       ----------------------          10:01 10:02 10:03 10:04
+            A   1  10  09:59                    A   1  10  09:59 100            
+            A   2  20  10:00                    A   1  20  10:00 100            q) wj[w; `sym`time; st1; (st2; (last;`px))]
+            B   3  30  10:01                    B   3  30  10:01 200            sym id qty  time  px
+            C   4  40  10:02                    C   4  40  10:02                -----------------------
+            A   1      09:58 100                                                A   1  10  09:59  100
+            B   3      10:00 200                                                A   2  20  10:00  100
+            B   5      10:03 210                                                B   3  30  10:01  210
+            D   6      10:01 300                                                C   4  30  10:02
+        </code></pre>
+    </div>
+
+</body>
+
+</html>

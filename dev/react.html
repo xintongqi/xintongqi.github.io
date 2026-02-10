@@ -1,0 +1,311 @@
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>React</title>
+    <link rel="stylesheet" href="../styles/main.css">
+    <link href="../styles/print.css" media="print" rel="stylesheet" />
+    <link rel="stylesheet"
+        href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.7.0/build/styles/default.min.css">
+    <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.7.0/build/highlight.min.js"></script>
+    <script>hljs.highlightAll();</script>
+    <style>
+        #app_dropdown {
+            display: none;
+        }
+
+        #app_dropdown li {
+            padding: 0;
+            margin: 0;
+        }
+    </style>
+    </script>
+</head>
+
+<body>
+    <header>
+        <h1>React</h1>
+    </header>
+
+    <nav>
+        <a href="../index.html">Back to home page</a>
+        <ul>
+            <li><a href="#jsx">JSX</a></li>
+            <li id="app_title">React Application</li>
+            <ul id="app_dropdown">
+                <li><a href="#app_structure">Application Structure</a></li>
+                <li><a href="#app_com">Components</a></li>
+                <li><a href="#app_inter">Component Interactions</a></li>
+                <li><a href="#app_props">Props</a></li>
+                <li><a href="#app_hooks">Hooks</a></li>
+            </ul>
+        </ul>
+    </nav>
+
+    <script type="text/javascript">
+        function expand() {
+            let dropdown = document.getElementById("app_dropdown");
+            if (dropdown.style.display === "none") {
+                dropdown.style.display = "block";
+            } else {
+                dropdown.style.display = "none"
+            }
+        }
+
+        document.getElementById("app_title").addEventListener("click", expand);     
+    </script>
+
+    <div id="jsx">
+        <h2>JSX</h2>
+        <ul>
+            <li>extended JS, cannot be rendered by browsers, must be compiled</li>
+            <li>idea is to treat html elements as variables in JS. those html pieces are called JSX elements <br>
+                If they span multiple lines, they have to be wrapped in parentheses.</li>
+            <li>a JSX expression must have exactly one outermost JSX element, usually just wrap everything with
+                <code>&ltdiv&gt</code>
+            </li>
+            <li>render JSX
+                <pre><code>const container = document.getElementById('app');
+// createRoot is a function from React; specifies where to put the rendered element
+const root = createRoot(container);
+// render tells the root to render what is passed; specifies what to render
+root.render(&lth1&gtHello world&lt/h1&gt);</code></pre>
+                <code>render()</code> only updates DOM elements that have changed when called multiple times
+            </li>
+            <li>subtleties: JSX vs html <br>
+                <ul>
+                    <li><code>class</code> tag in html becomes <code>className</code> in JSX. </li>
+                    <li>self-closing tags in html have to end with a forward slash,
+                        e.g., <code>&ltbr&gt</code> in html needs to be changed into <code>&ltbr/&gt</code> in JSX </li>
+                    <li>event listeners: <code>onclick</code> in html is written in camel case in JSX like
+                        <code>onClick</code>
+                    </li>
+                </ul>
+            </li>
+            <li>
+                escape from JSX into JS in the current file: use { }, e.g.
+                <code>const plusOne=&ltdiv&gt{someVar+1}&lt/div&gt&#59</code> <br>
+                note:
+                <ul>
+                    <li>you can access variables defined elsewhere in the same JS file from the brackets</li>
+                    <li>there is no if statement, either pull it out, or use the ternary operator, or use && operator
+                        <pre><code>// method 1: pull it out
+let outputMsg;
+if (success)
+    outputMsg = &ltdiv&gt{message.trueMsg}&lt/div&gt&#59
+else
+    outputMsg = &ltdiv&gt{message.falseMsg}&lt/div&gt&#59
+
+// method 2: ternary operator
+var outputMsg = &ltdiv&gt{success ? message.trueMsg : message.falseMsg}&lt/div&gt&#59
+
+// method 3: && operator
+// format: condition && do sth; if condition is met, then do something
+let outputMsg;
+outputMsg = {success && &ltdiv&gtmessage.trueMsg&lt/div&gt};
+outputMsg = {!success && &ltdiv&gtmessage.falseMsg&lt/div&gt};</code></pre>
+                    </li>
+                </ul>
+            </li>
+            <li>using .map to turn a list of strings into a list of JSX elements
+                <pre><code>const people = ['Rowe', 'Prevost', 'Gare'];
+
+// key=someStr: specifies the key, which allows orders to be preserved from one render to another
+const peopleList = people.map((person,i) =>
+    &ltli key='person_'+i>{person}&lt/li>
+);
+root.render(&ltul>{peopleList}&lt/ul>);</code></pre>
+            </li>
+            <li> write React without JSX: check out <code>React.createElement();</code></li>
+        </ul>
+    </div>
+
+    <div id="app">
+        <h2>React Application</h2>
+        <h4 id="app_structure">Application Structure</h4>
+        No single way of structuring the application, but here is one possible way. <br>
+        Note that index.js is usually the entry point (pretty much the same idea as index.html,
+        the browser first fetches this), app.js is usually located at top level.
+        <ul>
+            <li>/src/assets: images and global styles</li>
+            <li>/src/layouts: global layouts, such as headers and footers</li>
+            <li>/src/components: building components like buttons, etc.</li>
+            <li>/src/pages: application by page, which consists of multiple components</li>
+            <li>/src/config: for cross-environment development</li>
+            <li>/src/utils: repeatedly used functions</li>
+        </ul>
+        <figure>
+            <img src="../images/react_structure.jpeg" alt="react application file structure" width="800px">
+            <figcaption>image from <a
+                    href="https://www.xenonstack.com/insights/reactjs-project-structure">xenonstack</a></figcaption>
+        </figure>
+
+        <h4 id="app_com">Components</h4>
+        A React component is a reusable unit, which often involves rendering html whenever some data changes. <br>
+        To define a component:
+        <pre><code>/*App.js*/
+// first import lib; 'react' is installed as a dependency
+import React from 'react';
+
+// then use a func to define a component, called func component
+// the name MUST be capitalized, otherwise it's a built-in component
+function SomeComponent(){
+    return &lth1>This is a JSX element, reused as a react component.&lt/h1>;
+}
+
+// export this component
+export default SomeComponent;</code></pre>
+        A function component is essentially a set of instructions telling react how to build the component.
+        You can understand it as a global JS function. <br>
+        Function components must return some React elements in JSX syntax.
+
+        <pre><code>/*index.js*/
+// only import ReactDOM when you have render-related tasks
+import React from 'react';
+import ReactDOM from 'react-dom/client';
+
+// import the function component from App.js
+import SomeComponent from './App'
+
+// render the component using an html-like syntax
+ReactDOM.createRoot(document.getElementById('app')).render(&ltSomeComponent/>);
+
+/* very similar to the JSX example above, can break it down into
+ * var root = ReactDOM.createRoot(document.getElementById('app'));
+ * root.render(&ltSomeComponent/>);
+ * but if you write it like this, ReactDOM won't update when there is a change in SomeComponent */</code></pre>
+        In a react project, <code>.createRoot()</code> and <code>.render()</code> are usually only called once.
+        ReactDOM re-renders automatically when there is an update in the components. <br>
+        The argument passed to <code>.createRoot()</code> is usually the main component in <code>index.html</code>.
+
+        <h4 id="app_inter">Component Interactions</h4>
+        <pre><code>function RabbitImage(){
+    return &ltimg src="../rabbit" alt="rabbit"/>;
+} // a child of DisplayImage
+
+function DisplayImage(){
+    return &ltdiv> &ltRabbitImage/> &lt/div>
+}</code></pre>
+
+        <h4 id="app_props">Props</h4>
+        Each component has a prop, which is an object. <br>
+        What props are to components is similar to what attributes are to html elements. <br>
+        <br>
+        Props are usually used to pass info from parent to child.
+        They can be anything: strings, boolean, numbers, event handlers...
+        <pre><code>/* ShowProp.js */
+// parent: pass props to component, wrap with {} if the value is not a string
+function HandleClick(){
+    alert("Don't rush! I'm handling the event!");
+}
+
+function ShowProp(){
+    return &ltGreeting name="Bob" age={56} onClick={HandleClick}> Hello World &lt/Greeting>; 
+} // names of the props don't really matter, you can change them to myHandler={HandleClick}
+  // everything in between html tags, i.e. Hello World, can be access by child through props.children
+
+
+/* Greeting.js */
+// child
+function Greeting(props){
+    return (
+        &lth1 onClick={props.onClick}> 
+            {props.name}, aged {props.age}, says = {props.children}
+        &lth1/>
+    );
+}
+
+export default Greeting;</code></pre>
+
+        setting default values for props: three ways
+        <pre><code> // write in parameter
+function Greeting({message='Hello World'}){...}
+
+// write in function body
+function Greeting(props){
+    const {message = 'Hello World'} = props;
+    // ...
+}
+
+// write outside function
+Greeting.defaultProps = {
+  message: 'Hello World',
+};</code></pre>
+
+        use the <code>map</code> function to create an array of components
+        <pre><code>import React from 'react';
+import {comments} from './commentData'; // data source, an array
+
+import Card from './Card';
+
+function App(){
+  return comments.map(comments =>
+    &ltCard commentObject = {comments} />
+  );
+}
+
+export default App;</code></pre>
+
+        <h4 id="app_hooks">Hooks</h4>
+        hooks record the state of the application.
+        <pre><code>import React, {useState} from "react";
+ 
+function Toggle() {
+  const [toggle, setToggle] = useState("Off"); // give it a default value
+ 
+  return (
+    &ltdiv>
+        &ltp>The toggle is {toggle}&lt/p>
+        &ltbutton onClick={() => setToggle("On")}>On&lt/button>
+        &ltbutton onClick={() => setToggle("Off")}>Off&lt/button>
+    &lt/div>
+  );
+}</code></pre>
+        event handling with hooks
+        <pre><code>export default function EmailTextInput() {
+    const [email, setEmail] = useState('');
+
+    // define the handler: 2 ways
+    // method 1
+    const handleChange = (event) => setEmail(event.target.value);
+
+    // method 2
+    const handleChange = ({target}) => setEmail(target.value);
+
+    // return the component with the handler
+    return &ltinput value={email} onChange={handleChange} />
+}</code></pre>
+        React state is asynchronous. To ensure your info is up to date, use a callback function in the handler.
+        <pre><code>// callback function: function passed as argument
+// here prevIndex is a function that finds the previous index, it's passed as an argument to the state setter
+// since the setter depends on the value of prevIndex, synchronization achieved
+const goToNext = () => setIndex(prevIndex => prevIndex + 1);</code></pre>
+
+        Different types of hooks:
+        <ol>
+            <li>state hook: takes an argument of the intial state; <br>
+                <code>[state_var, set_state_var] = useState(initial_val)</code>
+            </li>
+            <li>effect hook: when DOM changes, this function is called; <br> <code>useEffect(() => { //... });</code>
+            </li>
+            <li>context hook: subscribe to global context (theme...) <br><code>useContext(someContext);</code></li>
+            <li>reducer hook: an alternative to state hook;
+                different from useState, it takes another argument <code>reducer</code>, which is basically a function
+                called on an array of states;
+                also, the state now becomes an array of states<br>
+                <code>[state_vars, set_state_var] = useState(reducer, initial_vals)</code>
+            </li>
+        </ol>
+        Rules for hooks:
+        <ol>
+            <li>only call hooks at the top level; do not call hooks inside loops, conditions or nested functions</li>
+            <li>only call hooks from react function components; do not call hooks from JS functions</li>
+        </ol>
+
+    </div>
+
+</body>
+
+</html>

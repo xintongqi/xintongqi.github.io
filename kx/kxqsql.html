@@ -1,0 +1,127 @@
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KX class</title>
+    <link rel="stylesheet" href="../styles/main.css">
+    <link rel="stylesheet" href="../styles/note1.css">
+    <link href="../styles/print.css" media="print" rel="stylesheet" />
+    <link rel="stylesheet"
+        href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.7.0/build/styles/default.min.css">
+    <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.7.0/build/highlight.min.js"></script>
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>
+        MathJax = {
+            tex: { inlineMath: [['$', '$'], ['\\(', '\\)']] }
+        };
+        hljs.registerLanguage('q', q)
+    </script>
+    <script>hljs.highlightAll();</script>
+</head>
+
+<body>
+    <header>
+        <h1>Q SQL</h1>
+    </header>
+
+    <nav>
+        <a href="../index.html">Back to home page</a>
+        <ul>
+            <li><a href="#qsql">Q-sql</a></li>
+            <li><a href="#functional">Functional Form</a></li>
+            <li><a href="#hacks">Performance hacks</a></li>
+        </ul>
+    </nav>
+
+    <div id="qsql">
+        <h2>Q-SQL</h2>
+
+        <h3>How to read table meta</h3>
+        what each column does:
+        <ul>
+            <li>c: column name</li>
+            <li>t: column type</li>
+            <li>f: foreign keys</li>
+            <li>a: attributes - modifiers for performance characters. see details <a
+                    href="kxtables.html#attributes">here</a></li>
+        </ul>
+        <pre><code class="q">
+            c        | t f a
+            -----------------
+            date     | d
+            month    | m
+            vendor   | s
+            time     | p   s 
+        </code></pre>
+
+        <h3>fby</h3>
+        Use <code>fby</code> when you find yourself trying to apply a filter to the aggregated column of a table
+        produced by <code>select...by...</code><br>
+        The basic syntax is:
+        <pre><code class="q">(aggregation;data) fby group</code></pre>
+        where <code>aggregation</code> is the aggregation function you want to apply, <code>data</code> is the column
+        you want to filter, and <code>group</code> is the column you want to group by. <br>
+
+        <h4>Example</h4>
+        Say you have this intermediate table, and you want to select from the original table <code>jan09</code> based on
+        type of vendor, but only records with <code>duration</code> greater than <code>avgDuration</code>, which is
+        simply the average of
+        <code>duration</code>.
+        <pre><code class="q">
+        q) res: select avgDuration: avg duration by vendor from jan09
+        q) res
+        vendor | avgDuration
+        ----------------------
+        CMT    |  6.480017e+11
+        DDS    |  7.600017e+11
+        VTS    |  7.290017e+11
+        </code></pre>
+
+        Without <code>fby</code>, you need to do it like this: <br>
+        First generate this intermediate table, then join <code>jan09</code> with this intermediate table.
+        <pre><code>select from jan09 lj res where duration > avgDuration</code></pre>
+
+        But with <code>fby</code>, you can do it like this:
+        <pre><code>select from jan09 where duration > (avg,duration) fby vendor</code></pre>
+
+        <h4>More on how to use fby</h4>
+        Keep in mind that <code>fby</code> is used as a filter (a where clause) on the aggregated column of a table, so
+        the three signs are 1. a filter, 2. an aggregated value, and 3. a value to group on. Here are more examples:
+        <ol>
+            <li>
+                Which vendor has the largest number of trips when only considering trips shorter than the
+                average duration of each vendor? <br>
+                <b>Where to use fby:</b> "when only considering trips shorter than the
+                average duration of each vendor?" <br>
+                <b>Constructed fby:</b> <code>(avg; duration) fby vendor</code>
+            </li>
+            <li>
+                Which payment type produces the highest average tip when only trups with a fare larger than the average
+                for each vendor is considered? <br>
+                <b>Where to use fby:</b> "when only trups with a fare larger than the average
+                for each vendor is considered?" <br>
+                <b>Constructed fby:</b> <code>(avg; fare) fby vendor</code>
+            </li>
+        </ol>
+
+
+        <h3>xbar</h3>
+        This, together with <code>by</code>, is used to group time/numeric values in to buckets. <br>
+        For example, for each severn day, find the min temperature and the max temperature.
+        <pre><code class="q">select min mintemp, max maxtemp by 7 xbar date from weather</code></pre>
+    </div>
+
+    <div id="hacks">
+        <h2>Performance hacks</h2>
+        <h3>where</h3>
+        When writing a <code>where</code> clause, it is always more efficient to put a date filter first, and then
+        filter on the other columns. This is due to the fact that kdb partitions data by date. <br>
+        In general, the first where clause should be the most restrictive, returning the smallest set of records.
+    </div>
+
+</body>
+
+</html>
