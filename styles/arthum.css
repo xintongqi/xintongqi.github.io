@@ -1,0 +1,105 @@
+header {
+    display: block;
+    position: fixed;
+    width: 100%;
+    padding: 10px;
+}
+
+nav {
+    display: block;
+    position: fixed;
+    top: 60px;
+    float: left;
+    width: 15%;
+    height: calc(100vh - 60px); 
+    overflow-y: auto;
+    padding-top: 30pt;
+    padding-left: 10pt;
+}
+
+nav ul {
+    padding-left:5%;
+    margin-top: 0%;
+}
+
+nav li{
+    padding: 1%;
+}
+
+div {
+    float: right;
+    width: 75%;
+    padding-right: 5%;
+    padding-left: 5%;
+}
+
+div h2 {
+    padding-top: 20px;
+    border-top: 1px solid grey;
+}
+
+header{
+    top: 0;
+    width: 100%;
+}
+
+div p {
+    float: left;
+    width: 60%;
+}
+
+h5 {
+    margin: 0;
+    padding: 0;
+}
+
+div figure {
+    width: 30%;
+    float: right;
+    padding: 4px;
+    margin: 0;
+}
+
+div figure img {
+    width: 300px;
+}
+  
+figcaption {
+    color:gray;
+    font-style: italic;
+    padding: 2px;
+    text-align: left;
+    font-size:small;
+}
+
+#midterm table, th, td {
+    border: 1px solid black;
+    border-collapse: collapse;
+    border-spacing: 1px;
+    text-align: left;
+    padding: 2px;
+}
+
+#midterm tr:nth-child(odd) {
+    background-color:lightyellow;
+}
+
+#midterm th {
+    background-color: yellow;
+}
+
+#final table, th, td {
+    border: 1px solid black;
+    border-collapse: collapse;
+    border-spacing: 1px;
+    text-align: left;
+    padding: 2px;
+}
+
+#final tr:nth-child(odd) {
+    background-color: lightblue;
+}
+
+#final th {
+    background-color:cornflowerblue;
+}

@@ -1,0 +1,136 @@
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KX class</title>
+    <link rel="stylesheet" href="../styles/main.css">
+    <link rel="stylesheet" href="../styles/note1.css">
+    <link href="../styles/print.css" media="print" rel="stylesheet" />
+    <link rel="stylesheet"
+        href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.7.0/build/styles/default.min.css">
+    <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.7.0/build/highlight.min.js"></script>
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>
+        MathJax = {
+            tex: { inlineMath: [['$', '$'], ['\\(', '\\)']] }
+        };
+        hljs.registerLanguage('q', q)
+    </script>
+    <script>hljs.highlightAll();</script>
+</head>
+
+<body>
+    <header>
+        <h1>IPC</h1>
+    </header>
+
+    <nav>
+        <a href="../index.html">Back to home page</a>
+        <ul>
+            <li><a href="#ipc">IPC</a></li>
+            <li><a href="#scripting">Scripting</a></li>
+        </ul>
+    </nav>
+
+    <div id="ipc">
+        <h2>IPC</h2>
+        <h3>I/O</h3>
+        <pre><code>
+            // use negative file handle values for asynchronous write
+            0 "this goes to console"
+            1 "this goes to stdout"
+            2 "this goes to stderr"
+        </code></pre>
+
+        <h3>File I/O</h3>
+        File paths in kdb start with <code>`:</code>. <br>
+        You can use <code>hsym</code> to turn a symbol/string into a file path, like this:
+        <code>hsym "my/file/path</code>. <br>
+        You can use <code>sv</code> to construct file paths from a list of folders, like this:
+        <code>` sv `:[list of folders]</code>. <br>
+        To list all files under a path, do this <code>key `:.</code><br>
+        <br>
+
+        Reading and writing to files in kdb: <br>
+        kdb files:
+        <pre><code>
+            // write to kdb file
+            `:tbl set tbl
+            // read from kdb file
+            get `:tbl
+        </code></pre>
+        txt files:
+        <pre><code>
+            // write to txt
+            fileHandle: hopen `:tbl.txt
+            fileHandle "writing some text without starting a new line"
+            neg[fileHandle] "starting a new line"
+            hclose fileHandle
+            // read from txt
+            read0 `:tbl.txt
+        </code></pre>
+        csv files:
+        <pre><code>
+            // write to csv
+            save `:tbl.csv
+            // read from csv
+            (type; delimiter) 0: `:tbl.csv
+        </code></pre>
+        json files:
+        <pre><code>
+            // write to json is the same as csv
+            save `:tbl.json
+            // read from json
+            load `:tbl.json
+        </code></pre>
+
+        <h3>Client and Server</h3>
+        <pre><code>
+            // on the server side
+            h:hopen `::portnumber
+            // on the client side
+            h:hopen `:localhost:portnumber
+            result:h("select from tablename where condition") // query some data
+            hclose h
+        </code></pre>
+    </div>
+
+    <div id="scripting">
+        <h2>Scripting</h2>
+        Scripting in kdb is easy, just save your code in a q file and load it in a q session using
+        <code>\l filename.q</code>.
+
+        <h3>Passing arguments</h3>
+        Three ways to pass arguments to a kdb script.
+        First way is to pass arguments in a q session when calling the script:
+        <pre><code>
+            q) name:"Alice"
+            q) \l myscript.q   // in myscript.q, you can access the variable name
+        </code></pre>
+        <br>
+        Second way is to use <code>.z.x</code>. The arguments will be unformatted as a list of strings. You don't need
+        to run the script in a q session.
+        <pre><code>
+            system["env QHOME=/opt/kx/q q myscript.q -name Alice -age 30"]
+        </code></pre>
+        In the script <code>myscript.q</code>, you can access the arguments using <code>.z.x</code>. In this example,
+        the output will be: <code>(\"-name\";\"Alice\";\"-age\";\"30\")</code>
+        <br>
+        Third way is to use <code>.Q.opt .z.x</code> this will return a formatted dictionary of arguments. <br>
+        Using the same example, the output will be <code>(`name`age)!(\"Alice\";\"30\")</code>
+
+        <h3>Hiding source code</h3>
+        If you only want the user to be able to run the script, but not execute individual functions defined in the
+        script, you can use the following method:
+        <pre><code>
+            \_ myscript.q       // this will hide the source code
+            \l myscript.q_      // this will load the hidden script
+        </code></pre>
+    </div>
+
+</body>
+
+</html>

@@ -1,0 +1,280 @@
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KX class</title>
+    <link rel="stylesheet" href="../styles/main.css">
+    <link rel="stylesheet" href="../styles/note1.css">
+    <link href="../styles/print.css" media="print" rel="stylesheet" />
+    <link rel="stylesheet"
+        href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.7.0/build/styles/default.min.css">
+    <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.7.0/build/highlight.min.js"></script>
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>
+        MathJax = {
+            tex: { inlineMath: [['$', '$'], ['\\(', '\\)']] }
+        };
+        hljs.registerLanguage('q', q)
+    </script>
+    <script>hljs.highlightAll();</script>
+</head>
+
+<body>
+    <header>
+        <h1>Control Flow</h1>
+    </header>
+
+    <nav>
+        <a href="../index.html">Back to home page</a>
+        <ul>
+            <li><a href="#functions">Functions</a></li>
+            <li><a href="#if">If Else</a></li>
+            <li><a href="#iterators">Iterators</a></li>
+        </ul>
+    </nav>
+
+    <div id="functions">
+        <h2>Functions</h2>
+        The minimum and maximum number of arguments a function can take in q is zero and eight. <br>
+        Zero parameter: niladic <br>
+        One parameter: monadic <br>
+        Two parameters: dyadic
+
+        <h3>Function syntax</h3>
+        Defining a function:
+        <pre><code class="q">
+            func:{[param1; param2]
+                // do something
+            };
+        </code></pre>
+
+        Calling a function:
+        <pre><code class="q">func[param1; param2]</code></pre>
+        Special cases:
+        <ul>
+            <li>To call on a list of values: <code>func[var1 var2; param2]</code></li>
+            <li>To call within a query: <code>select newCol:func[col1; col2] from tbl</code></li>
+        </ul>
+
+        <h3>Function forms</h3>
+        Operators can be used as if they were functions. Just pass the operands as arguments. <br>
+        <pre><code class="q">
+            q) 1 in 2 3
+            q) in[1; 2 3] // returns 0b
+        </code></pre>
+
+        <h3>Projections</h3>
+        Projections are a way to create new functions by fixing some arguments of an existing function. <br>
+        For example, to create a function that adds 5 to its argument:
+        <pre><code class="q">
+            q) add5: 5+
+            q) add5: +[5;]  // equivalent but in functional form
+            q) add5: +[5]   // also works; another way to write in functional form
+            q) add5 10      // returns 15
+        </code></pre>
+        Note that it has to be defined as <code>5+</code> instead of <code>+5</code>.
+        i.e., the number has to be the first operand/argument. <br>
+        But if you're using functional form, order doesn't really matter.
+
+        <h3>Variable scope</h3>
+        Same as other languages, variables defined within a function are local to that function. <br>
+        To define a global variable within a function, use the <code>::</code> operator, which can also be writen as
+        <code>set</code>.
+        <pre><code class="q">
+            q) myFunc: { b::10; `c set 20 }     // b and c are global variables
+            q) delete b c from `.               // delete global variables
+        </code></pre>
+        Note that there are minor differences between using <code>::</code> and <code>set</code>:
+        <ul>
+            <li>If using <code>::</code>, if there is a local variable with the same name, it does not overwrite that
+                local variable <code>b</code></li>
+            <li>If using <code>set</code>, if there is a local variable with the same name, it overwrites that local
+                variable <code>c</code> as well.</li>
+        </ul>
+
+        <h3>Best practices</h3>
+        <ol>
+            <li>Explicit argument declaration: only use x,y,z if the function is very simple.</li>
+            <li>Don't do too much in one line: if you see a function has multiple layers of brackets, break it up into
+                smaller functions.</li>
+            <li>Indent if statements properly</li>
+            <li>Don't use <code>:</code> to return at the end because by default q returns the last expression
+                evaluated. Only use it if you want to return early, or if it's in an if statement.</li>
+        </ol>
+    </div>
+
+    <div id="if">
+        <h2>If statements</h2>
+        Two ways to do if statements. <br>
+        The first way only contains the if part, no else part.
+        <pre><code class="q">
+            if[condition;
+                do this if true;
+                then do this;
+            ]
+        </code></pre>
+        By default, this type of if does not return anything. If you want to return, you have to use <code>:</code> to
+        exit early. And you have to wrap this if statment in a function, like this:
+        <pre><code class="q">
+            myFunc: {[]
+                if[condition;
+                    do this if true;
+                    then do this;
+                    : return some value;
+                ];
+            }
+        </code></pre>
+        <br>
+        The second way contains both if and else parts. It needs to be done with <code>$</code>.
+        <pre><code class="q">
+            $[condition;
+                [
+                    do this if true;
+                    then do this;
+                ];
+                do this if false;
+            ]
+        </code></pre>
+        By default, this structure returns either the last statment in the true block or the false block, so you don't
+        need to wrap it up. But if you put a semicolon at the end of the last statement (like above), it won't return
+        anything. <br>
+        With this structure, you can have nested if-else.
+        <pre><code class="q">
+            fizzbuzz: {[] 
+                $[0=x mod 3;
+                    $[0=x mod 5;
+                       `fizzbuzz;    // divided by both 3 and 5
+                       `fizz         // divided by 3 only
+                    ];
+                    0=x mod 5;
+                        `buzz;        // divided by 5 only
+                    x                 // not divisible by either
+                ]
+            }
+        </code></pre>
+        <br>
+        You can also do something like a switch in other languages:
+        <pre><code class="q">grade: {[] $[x>=90; `A; x>=80; `B; x>=70; `C; x>=60; `D; `F]}</code></pre>
+        <br>
+        Addtionally, you can pass multiple conditions as a boolean list:
+        <pre><code class="q">
+            ?[10001b;
+                1 2 3 4 5;  // true block
+                10 20 30 40 50 // false block
+            ] // returns 1 20 30 40 5
+        </code></pre>
+        This can be very handy when the input is a list. For example, to replace all negative values in a list to its
+        absolute value, you can just do <code>replaceNegative: {[] ?[x<0; -1*x; x]}</code>
+
+        <h3>Try-catch block</h3>
+        Try-catch block is called trap <code>@</code> in q. The syntax is:
+        <pre><code class="q">@[function; argument; errorHandler]</code></pre>
+        This basically says, pass the arguments to the function. If it runs successfully, nothing happens. But if it
+        fails, the errorHandler will be run. <br>
+        The errorHandler is a function that takes one argument, which is the error message. <br>
+        For example:
+        <pre><code class="q">protectedSin: {[x] @[sin; x; {`errorOccurred}]}</code></pre>
+    </div>
+
+    <div id="iterators">
+        <h2>Iterators</h2>
+
+        Most iteration is handled by q operators implicitly. e.g., <code>1 2 3 + 4 5 6</code><br>
+        But implicit iteartors require that two operands are equal in length. <br>
+        When you need to iterate over two lists of different lengths, you need to use an explicit iterator.
+
+        <h3>Each and peach</h3>
+        <code>each</code> only works on functions with one parameter, such as <code>f[;y]</code> in the example above
+        and <code>count</code>. <br>
+        If you have a function with more than one parameter, such as <code>in</code>, you need to fix some of the
+        parameters using projections. For example you can do <code>5 in</code> to create a function that checks if 5 is
+        in a list. <br>
+        <code>peach</code>, aka, parallel each is jsut a multi-threaded version, same stuff.
+        <pre><code>
+            q) L:("the";"quick";"brown";"fox")
+            q) count each L         // only one parameter L, used on the function count
+            3 5 5 3
+            q) each[count; L]       // same as above; functional form
+        </code></pre>
+
+        <h3>Each-both '</h3>
+        Each-both works on two lists in a pairwise fashion. <br>
+        <code>each-both '</code> works on functions with two parameters, for example <code>take #</code>
+        <pre><code>
+            q) L:("the";"quick";"brown";"fox")
+            q) 3#'L                 
+            "the"       // take 3 from "the"
+            "qui"       // take 3 from "quick"
+            "bro"       // take 3 from "brown"
+            "fox"       // take 3 from "fox"
+        </code></pre>
+        Pay attention to the syntax here, don't think of <code>'</code> as a function that takes three parameters.
+        Instead, think of it as something that can be attached to a function that takes two parameters, and creates a
+        "new" function that takes two arguments.
+        <pre><code>
+            q) #'[x; y]   // this works too; functional form
+            q) '[#; x; y] // this is NOT going to work
+        </code></pre>
+        Each-both is actually what's under the hood when you do <code>+</code> and other operators on two lists.
+
+
+        <h3>Each-left \: and each-right /:</h3>
+        Again, think of each-left and each-right as something that can be attached to a function that takes two
+        parameters, and creates a "new" function that takes two arguments. <br>
+        Each-left: applies <b>each</b> element on the <b>left</b> to the whole list on the right. <br>
+        Each-right: applies <b>each</b> element on the <b>right</b> to the whole list on the left.
+        <pre><code>
+            q) 1 2 +\: 3 4 5        // each-left
+            4 5 6
+            5 6 7
+            q) 1 2 +/: 3 4 5        // each-right
+            4 5
+            5 6
+            6 7
+        </code></pre>
+
+        <h3>Each-prior ':</h3>
+        <code>each-prior ':</code> is also known as <code>prior</code>. <br>
+        And again, think of it as something attached to a function to modify its behavior. <br>
+        When you attach this to a function that takes two parameters, it will apply the function to each element in the
+        list and the <b>prior</b> element in the list. <br>
+        <pre><code>
+            q) 0 +': 10 20 30 40 50
+            q) +'[10 20 30 40 50]        // alternatively, use functional form, the first parameter is by default 0 or null
+            10 30 50 70 90
+        </code></pre>
+        How do we get the list? 0+10, 10+20, 20+30, 30+40, 40+50.
+
+        <h3>Scan and over</h3>
+        Scan and over are accumulators, meaning they carry over the result of the previous computation to the next. <br>
+        Because of this, they only work with functions with two parameters.
+        <pre><code>
+            q) +/ 1 2 3 4 5             // over: only shows the final result
+            15
+            q) +\ 1 2 3 4 5             // scan: shows the intermediate results
+            1 3 6 10 15
+            q) *\ [11; 1 2 3 4 5]       // the argument can be a list
+            11 22 66 264 1320
+        </code></pre>
+
+        <h3>Do and while</h3>
+        DO NOT USE THEM!! <br>
+        They are very slow. But the syntax is like this:
+        <pre><code>
+            q) do[noOfTimes; expression1; expression2; ...]
+            q) while[condition; expression1; expression2; ...]
+        </code></pre>
+        There is almost always a way to use the iterators above to replace them.
+        <pre><code>
+            q) do[count prices; result,; prices[i]*quantities[i]]    // BAD, BAD, BAD
+            q) result: prices * quantities                           // GOOD
+            q) customizedFunc'[prices; quantities]                   // if there's no built-in function, use each-both
+        </code></pre>
+    </div>
+
+</body>
+
+</html>

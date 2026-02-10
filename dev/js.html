@@ -1,0 +1,450 @@
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JS</title>
+    <link rel="stylesheet" href="../styles/main.css">
+    <link href="../styles/print.css" media="print" rel="stylesheet" />
+    <link rel="stylesheet"
+        href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.7.0/build/styles/default.min.css">
+    <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.7.0/build/highlight.min.js"></script>
+    <script>hljs.highlightAll();</script>
+    <style>
+        #basis_dropdown {
+            display: none;
+        }
+
+        #basis_dropdown li {
+            padding: 0;
+            margin: 0;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <h1>JS</h1>
+    </header>
+
+    <nav>
+        <a href="../index.html">Back to home page</a>
+        <ul>
+            <li><a href="#dom">DOM</a></li>
+            <li id="basis_title">Basis</li>
+            <ul id="basis_dropdown">
+                <li><a href="#basis_var">Variables</a></li>
+                <li><a href="#basis_data">Data Types</a></li>
+                <li><a href="#basis_op">Operators</a></li>
+                <li><a href="#basis_ctrl">Control Flow</a></li>
+                <li><a href="#basis_loop">Loops</a></li>
+                <li><a href="#basis_label">Label Statement</a></li>
+                <li><a href="#basis_err">Error Handling</a></li>
+            </ul>
+            <li><a href="#func">Functions</a></li>
+            <li><a href="#ds">Data Structures</a></li>
+            <li><a href="#oop">OOP</a></li>
+        </ul>
+    </nav>
+
+    <script type="text/javascript">
+        function expand() {
+            let dropdown = document.getElementById("basis_dropdown");
+            if (dropdown.style.display === "none") {
+                dropdown.style.display = "block";
+            } else {
+                dropdown.style.display = "none"
+            }
+        }
+
+        document.getElementById("basis_title").addEventListener("click", expand);     
+    </script>
+
+    <div id="dom">
+        <h2>DOM</h2>
+        Just a quick recap on DOM: an API provided by browsers. Click on below to expand.<br>
+        <details>
+            <summary>components of a DOM</summary>
+            <li>document: the root element</li>
+            <li>node: basically every element in the tree</li>
+            <li>element: only html tags are counted as elements, i.e., node minus attributes, text, comments, etc.</li>
+            <li>nodeList: a list of nodes; access through <code>myList[index]</code> or <code>myList.item(index)</code>
+            </li>
+            <li>attributes: html attributes</li>
+            <li>namedNodeMap: a map with order</li>
+        </details>
+
+        <details>
+            <summary>some key functions</summary>
+            <li><code>document.querySelector("selector")</code>: selector is a css selector; returns an object</li>
+            <li><code>document.querySelectorAll("selector")</code></li>
+            <li><code>document.createElement("name")</code>: name is an html element name</li>
+            <li><code>parentNode.appendChild(node)</code>: can nest <code>appendChild()</code> calls onto a single node
+            </li>
+            <li><code>element.innerHTML</code> and <code>element.style</code></li>
+            <li><code>element.getAttribute("name")</code> and <code>element.setAttribute("name", value)</code></li>
+            <li><code>element.addEventListener("event type", listener...)</code>: listener is null or a function, there
+                are more parameters in this function</li>
+        </details>
+    </div>
+
+    <div id="basis">
+        <h2>Basis</h2>
+        client-side JS: run on browsers, respond to user actions such as onclick <br>
+        server-side JS: run on servers, pretty much like Java servers
+        <h4 id="basis_var">Variables</h4>
+        Scopes of variables:
+        <ul>
+            <li>global: exported variables</li>
+            <li>module: visible in the same module (same file)</li>
+            <li>function: visible in the same function</li>
+            <li>block: visible only in between brackets. different from function-scoped, if you put it in an
+                if-statement it won't be available outside</li>
+        </ul>
+        Three ways to declare variables:
+        <ul>
+            <li><code>var</code>: module-scoped / function-scoped by default; initialization optional</li>
+            <li><code>let</code>: module-scoped / function-scoped / block-scoped by default; initialization optional
+            </li>
+            <li><code>const</code>: module-scoped / function-scoped / block-scoped by default; must be initialized,
+                read-only</li>
+        </ul>
+        <pre><code>var x = 3;
+function countNumber(){
+    var x = 4;
+    console.log(x); // evaluates to 4, these two x are essentially the same
+}
+console.log(x); // this is also 4 </code></pre>
+        <pre><code>let x = 3;
+function countNumber(){
+    let x = 4; // error: cannot declare x twice
+    console.log(x); 
+}
+console.log(x);</code></pre>
+        Additional notes: <br>
+        Hoisted declaration: if you access a <code>var</code> before it is declared, it's actually ok, but it'll
+        evaluate to undefined.
+        Note that this does NOT apply to <code>let</code> and <code>const</code>. <br>
+        Constants cannot have the same name as other functions or variables in the same scope. <br>
+        Constants allow mutations: you cannot change value, but you can change values inside.
+        <pre><code>const MY_ARR = [100, 200];
+MY_ARR[0] = 200; // this is allowed
+MY_ARR = [200, 300]; // this is NOT allowed</code></pre>
+
+        <h4 id="basis_data">Data Types</h4>
+        <pre><code>// strings, numbers, booleans
+let str1 = 'hello'; 
+let str2 = "hello";
+let num = 5.20;
+let success = true;
+
+// BigInt: cannot directly convert into primitives
+const a = Number(1n) + 2; // 3
+const b = 1n + BigInt(2); // 3n
+
+// arrays: doesn't have to be same data type
+let names = ["Amy", 2023, "Bob", 4096, "Carly", true];
+
+// objects
+let header = document.querySelector('h1');</code></pre>
+        Notes on data types: <br>
+        JS is dynamically typed. <br>
+        Apart from primitive types (boolean, number...), there are wrappers called literals,
+        pretty much the same idea as Java primitive and wrappers (int and Integer). Strings, arrays and objects are
+        literals.<br>
+        <br>
+
+        More about numbers: <br>
+        JS numbers are 64 bit doubles. For numbers that require more digits, use <code>BigInt</code>.<br>
+        apart from numeric values, numbers have three other values: <code>+Infinity</code>, <code>-Infinity</code>,
+        <code>NaN</code>. <br>
+        binary <code>0b1001</code>, octal <code>0o1234</code>, hex <code>0x1234</code>. <br>
+        exponent <code>123e-2=1.23</code>, <code>123e2=12300</code>. Note that e and E are the same. <br>
+        number object:
+        <pre><code>const biggestNum = Number.MAX_VALUE;
+const smallestNum = Number.MIN_VALUE;
+const infiniteNum = Number.POSITIVE_INFINITY;
+const negInfiniteNum = Number.NEGATIVE_INFINITY;
+const notANum = Number.NaN;</code></pre>
+        math object:
+        <pre><code>Math.PI;
+Math.sin(3.14);
+Math.abs(-3);
+Math.pow(2);
+Math.floor(2.4);
+Math.min(2,4,5);</code></pre>
+
+        More about strings: <br>
+        <code>+</code> are concats when one of the operands is a string. <br>
+        string interpolation: <br>
+        <pre><code>const name = 'Lev', time = 'today';
+`Hello ${name}, how are you ${time}?`</code></pre>
+
+        <h4 id="basis_op">Operators</h4>
+        <pre><code>** // exponentiation
+>> // signed right shift (left pad with 1 if the number is negative)
+>>> // unsigned right shift (left pad with 0 regardless of the sign), BigInt doesn't support this
+x??=1; // assigns x=1 if x is null</code></pre>
+
+        desctructuring assignment
+        <pre><code>const foo = ["one", "two", "three"];
+
+// without destructuring
+const one = foo[0];
+const two = foo[1];
+const three = foo[2];
+
+// with destructuring
+const [one, two, three] = foo;</code></pre>
+        arithmatics <br>
+        <pre><code>1/0 === Infinity;
+1/2 === 1.0/2.0;</code></pre>
+
+        logical operators (short circuit)
+        <pre><code>const and1 = "Cat" && "Dog"; // true && true returns Dog
+
+const or1 = "Cat" || "Dog"; // true || true returns Cat
+const or2 = false || "Cat"; // f || t returns Cat
+const or3 = "Cat" || false; // t || f returns Cat
+
+const not1 = !"Cat"; // !t returns false</code></pre>
+
+        <code>delete</code> operator: deletes an object's property. Don't use it on arrays.
+        <pre><code>delete object.property;
+delete object[propertyKey];
+delete objectName[index];
+
+// note that you cannot delete system defined properties
+delete Math.PI; // can't do this</code></pre>
+
+        <code>typeof</code> operator
+        <pre><code>typeof myFun; // const myFun = new Function("5 + 2"); returns "function"
+typeof shape; // const shape = "round"; returns "string"
+typeof size; // const size = 1; returns "number"
+typeof foo; // const foo = [1,2,3]; returns "object"
+typeof null; // returns "object"
+typeof doesntExist; // returns "undefined" </code></pre>
+
+        <code>in</code> operator: check if the object contains that property
+        <pre><code>// Arrays
+const trees = ["redwood", "bay", "cedar", "oak", "maple"];
+0 in trees; // returns true, 0 is index
+"bay" in trees; // returns false (CANNOT use in to check if the array contains an element)
+"length" in trees; // returns true (length is an Array property)
+
+// Strings
+const myString = new String("coral");
+"length" in myString; // returns true
+
+// Objects
+const mycar = { make: "Honda", model: "Accord", year: 1998 };
+"model" in mycar; // returns true</code></pre>
+
+        <code>instanceof</code> operator: check if the object is of a type
+        <pre><code>const theDay = new Date(1995, 12, 17);
+if (theDay instanceof Date) {
+  // statements to execute
+}</code></pre>
+
+        <h4 id="basis_ctrl">Control Flow</h4>
+        Never, ever use <code>==</code> in JS. Use <code>===</code> and <code>!==</code>. <br>
+        These are considered false in evaluation: <code>false, undefined, null, 0, NaN, ""</code>.
+        <pre><code>// boolean objects and primitives are different!
+const obj = new Boolean(false);
+if (obj) // true 
+if (obj == false) // true
+if (obj === false) // false
+
+const pri = false;
+if (pri) // false 
+if (pri == false) // true
+if (pri === false) // true</code></pre>
+
+        <h4 id="basis_loop">Loops</h4>
+        Let's skip for, while, do-while, and look at the JS version of foreach: two variations, for...in and for...of.
+        <pre><code>const arr = [3, 5, 7];
+arr.foo = "hello";
+
+for (const i in arr) // for...in iterates over keys, which are indexes for arrayss
+    console.log(i); // "0" "1" "2" "foo"
+
+for (const i of arr) // for...of iterates over values
+    console.log(i); // Logs: 3 5 7 there is no hello because it only looks at indexed property
+                </code></pre>
+
+        <h4 id="basis_label">Label Statement</h4>
+        Basically an alternative to boolean flag, very similar to <code>goto</code> in C. <br>
+        Note that when you use lable on a loop, the value of the iterator does not start all over but continues with
+        what's left.
+        <pre><code>// The first for statement is labeled "loop1"
+loop1: for (let i = 0; i &lt 3; i++) {
+    // The second for statement is labeled "loop2"
+    loop2: for (let j = 0; j &lt 3; j++) {
+    if (i === 1 && j === 1)
+        continue loop1; // can use lable statement with either continue or break
+    console.log(`i = ${i}, j = ${j}`);
+    }
+}
+
+// Logs:
+// i = 0, j = 0
+// i = 0, j = 1
+// i = 0, j = 2
+// i = 1, j = 0 if you change continue to break, logs stop after this line is printed
+// i = 2, j = 0
+// i = 2, j = 1
+// i = 2, j = 2</code></pre>
+
+        <h4 id="basis_err">Error Handling</h4>
+        <pre><code>funtion myFunc() {
+    // ... 
+    if (success)
+        return true;
+    throw new Error("Execution failed!");
+}
+
+try {
+    myFunc();
+} catch (e) {
+    console.error(e, e.stack); // other alternatives available, e.g., console.error(e.message);
+} finally {
+    // clean up...
+    // if there is a return statement here, whatever returned here is the return value of this try-catch-finally block
+    // return statements and throw statements prior to this return will be ignored
+}</code></pre>
+        Nesting try-catch-finally: possible. but the inner block must either has a catch block or a finally block.
+
+
+    </div>
+
+    <div id="func">
+        <h2>Functions</h2>
+        <h4>Hoisted declaration</h4>
+        Functions are essentially objects in JS.
+        Similar to hoisted declaration of variables, function declarations are also hoisted.
+        You can assume that they appear at the top of the module wherever they are declared. <br>
+        But note that hoisted declaration DOES NOT apply to function expressions mentioned below.<br>
+        <br>
+        JS is pass by value, but that doesn't mean you can't change the fields of an object. See below.
+        <pre><code>function changeStuff(a, b, c)
+{
+  a = a * 10;
+  b.item = "changed";
+  c = {item: "changed"};
+}
+
+var num = 10;
+var obj1 = {item: "unchanged"};
+var obj2 = {item: "unchanged"};
+
+changeStuff(num, obj1, obj2);
+
+console.log(num); // 10, num is not changed because it's a primitive
+console.log(obj1.item); // changed, you can change the field of a non-primitive such as array or object
+console.log(obj2.item); // unchanged, you can change the field, but it's pass by value, you can't change the var itself</code></pre>
+
+        <h4>Function expressions</h4>
+        Basically assigning a function to a variable, so that you can pass it to other functions. <br>
+        Since you are treating it as a variable, you can use if-statement on function definition, pretty much like how
+        you initialize a variable with an if-statement. <br>
+        <pre><code>function map(f, a) { // takes a function as an argument
+  const result = new Array(a.length);
+  for (let i = 0; i &lt a.length; i++)
+    result[i] = f(a[i]);
+  return result;
+}
+
+const cube = function (x) { // assign this unnamed function to a variable called cube
+  return x * x * x;         // even if it's named, say function cubeNum(x), it won't work if you call cubeNum()
+};                          // only works if you refer to this function as cube
+
+const numbers = [0, 1, 2, 5, 10];
+console.log(map(cube, numbers)); // [0, 1, 8, 125, 1000]</code></pre>
+
+        <h4>Function scope and nested functions</h4>
+        A function can access whatever that shares the same scope or with a greater scope. e.g.
+        A function defined in the global scope can access all variables defined in the global scope.
+        A function defined inside another function can also access all variables to which the parent function has
+        access,
+        but the parent cannot access the child because the child is private to the parent (scope is greater). <br>
+        <pre><code>function outside(x) {
+  function inside(y) {
+    return x + y;
+  }
+  return inside;
+}
+
+const fnInside = outside(3); // Think of it like: give me a function that adds 3 to whatever you give it
+console.log(fnInside(5)); // 8
+console.log(outside(3)(5)); // 8</code></pre>
+
+        <h4>Parameters and arguments</h4>
+        Arguments can be accessed as an array within a function. Just use <code>arguments[idx]</code>.
+        <pre><code>function multiply(a, b = 1) { // you can set default parameters, otherwise they are undefined by default
+  return a * b;
+}
+console.log(multiply(5)); // 5
+
+function multiply(multiplier, ...theArgs) { // or use rest parameter, which allows an infinite number of arguments passed to this function
+    return theArgs.map((x) => multiplier * x);
+}
+const arr = multiply(2, 1, 2, 3);
+console.log(arr); // [2, 4, 6]</code></pre>
+
+        <h4>Arrow functions</h4>
+        <pre><code>const a = ["Hydrogen", "Helium", "Lithium", "Beryllium"];
+
+const a2 = a.map(function (s) {
+  return s.length;
+});
+
+console.log(a2); // [8, 6, 7, 9]
+
+const a3 = a.map((s) => s.length);
+
+console.log(a3); // [8, 6, 7, 9]</code></pre>
+        arrow functions vs regular functions declare with <code>function</code>:
+        <ol>
+            <li><code>this</code> inside an arrow function always refer to the outer function; but in a regular function
+                it could refer to many things</li>
+            <li>arrow function cannot be used with the <code>new</code> keyword, i.e., constructors have to be regular
+                functions</li>
+            <li>you don't need to <code>return</code> in an arrow function</li>
+        </ol>
+    </div>
+
+    <div id="ds">
+        <h2>Data Structures</h2>
+        <h4>Array Literals</h4>
+        Arrays are not variables, they are literals.
+        <pre><code>let names = ["Amy", 2023, , 4096, "Carly", true]; // this is okay. names.length = 6, names[2] = &ltempty item>
+let names = ["Amy", 2023, , 4096, "Carly", true,] // names.length = 6, only trailing commas are ignored</code></pre>
+
+        <h4>Objects</h4>
+        <pre><code>const car = { myCar: "Saturn", getCar: carTypes("Honda"), special: sales };
+const car = { "!": "Saturn", "?": carTypes("Honda"), "|": sales }; // invalid property names must be enclosed in quotes.</code></pre>
+
+        <h4>Collections</h4>
+    </div>
+
+    <div id="oop">
+        <h2>OOP</h2>
+        <h4>Encapsulation with nested functions</h4>
+        More about nested functions, see <a
+            href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Functions#closures">closures</a>.
+        <pre><code>const getCode = (function () {
+  const apiCode = "0]Ealeh&2"; // A code we do not want outsiders to be able to modify…
+
+  return function () {
+    return apiCode;
+  };
+})();
+
+console.log(getCode()); // "0]Ealeh&2"
+</code></pre>
+    </div>
+
+</body>
+
+</html>
