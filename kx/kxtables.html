@@ -305,9 +305,9 @@
                         <code>(st1.time-00:02:00 st1.time+00:02:00)</code>
                     </li>
                     <li>c is a symbol list of column names to join on, and the last column is a sortable type, typically
-                        time</li>
-                    <li>t1 is a table, sorted</li>
-                    <li>t2 is a table, sorted</li>
+                        c is `sym`time</li>
+                    <li>t1 is a table, ideally sorted on columns in c</li>
+                    <li>t2 is a table, MUST BE sorted on columns in c</li>
                     <li>(f0;c0) and (f1;c1) are aggregations applied on columns; examples are
                         <ul>
                             <li>(avg; `price)</li>

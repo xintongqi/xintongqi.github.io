@@ -1,0 +1,125 @@
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KX class</title>
+    <link rel="stylesheet" href="../styles/main.css">
+    <link rel="stylesheet" href="../styles/note1.css">
+    <link href="../styles/print.css" media="print" rel="stylesheet" />
+    <link rel="stylesheet"
+        href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.7.0/build/styles/default.min.css">
+    <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.7.0/build/highlight.min.js"></script>
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>
+        MathJax = {
+            tex: { inlineMath: [['$', '$'], ['\\(', '\\)']] }
+        };
+        hljs.registerLanguage('q', q)
+    </script>
+    <script>hljs.highlightAll();</script>
+</head>
+
+<body>
+    <header>
+        <h1>Namespace <br> and Scripting</h1>
+    </header>
+
+    <nav>
+        <a href="../index.html">Back to home page</a>
+        <ul>
+            <li><a href="#namespace">Namespace</a></li>
+            <li><a href="#scripting">Scripting</a></li>
+        </ul>
+    </nav>
+
+    <div id="namespace">
+        <h2>Namespace</h2>
+        You can think of a namespace as a package or a module in python. <br>
+        There are two ways to work with namespaces: the <code>\d</code> method and the fully qualified method.
+        <pre><code>
+            q) a: 1
+            
+            // \d method
+            q) \d .myNamespace              // create a namespace
+            q.myNamespace) a: 2             // notice how the prompt changes to q.myNamespace
+            q.myNamespace) a
+            2
+            q) \d .                         // go back to the root namespace
+            q) a
+            1
+
+            // fully qualified method
+            q) .myNamespace2.a: 3           // create a namespace
+            q) @[`.myNamespace2; `a; :; 4]  // equivalent functional form, but namespace must exist first
+            q) .myNamespace2.a
+            4
+            q) a
+            1 
+        </code></pre>
+
+        Difference between the two methods is
+        <ul>
+            <li>\d method: cannot access global variables in the root namespace, but can access variables in the same
+                namespace</li>
+            <li>fully qualified method: can access global variables in the root namespace, but cannot access variables
+                in the same namespace</li>
+        </ul>
+        To demonstrate the difference
+        <pre><code>
+            q) a: 1
+
+            // \d method cannot access global variables in the root namespace
+            q) \d .myNamespace
+            q.myNamespace) f:{1+a}          // this will fail because a isn't available here
+            q.myNamespace) f:{1+get`..a}    // unless you use get to access `. namespace
+            // but is able to access variables in the same namespace
+            q.myNamespace) b: 100
+            q.myNamespace) f2:{1+b}         // this is okay
+
+            // fully qualified method can access global variables in the root namespace
+            q) .myNamespace2.f:{1+a}        // this is okay
+            // but not able to access variables in the same namespace
+            q) .myNamespace2.b: 100
+            q) .myNamespace2.f2:{1+b}       // this will fail because b is not available here
+        </code></pre>
+    </div>
+
+    <div id="scripting">
+        <h2>Scripting</h2>
+        Scripting in kdb is easy, just save your code in a q file and load it in a q session using
+        <code>\l filename.q</code>.
+
+        <h3>Passing arguments</h3>
+        Three ways to pass arguments to a kdb script.
+        First way is to pass arguments in a q session when calling the script:
+        <pre><code>
+            q) name:"Alice"
+            q) \l myscript.q   // in myscript.q, you can access the variable name
+        </code></pre>
+        <br>
+        Second way is to use <code>.z.x</code>. The arguments will be unformatted as a list of strings. You don't need
+        to run the script in a q session.
+        <pre><code>
+            system["env QHOME=/opt/kx/q q myscript.q -name Alice -age 30"]
+        </code></pre>
+        In the script <code>myscript.q</code>, you can access the arguments using <code>.z.x</code>. In this example,
+        the output will be: <code>(\"-name\";\"Alice\";\"-age\";\"30\")</code>
+        <br>
+        Third way is to use <code>.Q.opt .z.x</code> this will return a formatted dictionary of arguments. <br>
+        Using the same example, the output will be <code>(`name`age)!(\"Alice\";\"30\")</code>
+
+        <h3>Hiding source code</h3>
+        If you only want the user to be able to run the script, but not execute individual functions defined in the
+        script, you can use the following method:
+        <pre><code>
+            \_ myscript.q       // this will hide the source code
+            \l myscript.q_      // this will load the hidden script
+        </code></pre>
+    </div>
+
+</body>
+
+</html>

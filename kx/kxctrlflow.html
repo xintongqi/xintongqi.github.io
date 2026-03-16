@@ -259,6 +259,17 @@
             q) *\ [11; 1 2 3 4 5]       // the argument can be a list
             11 22 66 264 1320
         </code></pre>
+        If you want to mimic the bahavior of a for/while loop on a function <code>f:2*</code>, you can do something like
+        this with scan (same thing works for over):
+        <pre><code>
+            q) 3 f\2 7              // this is similar to: for i in range(3), apply f to the list [2;7]
+            4 14
+            8 28
+            16 56
+            q) {last[x]<20} f\2 7   // this is similar to while last element in the list is less than 20, apply f to the list [2;7]
+            4 14
+            8 28                    // 28 breaks the while loop
+        </code></pre>
 
         <h3>Do and while</h3>
         DO NOT USE THEM!! <br>

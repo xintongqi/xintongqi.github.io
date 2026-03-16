@@ -1,3 +1,4 @@
+# Ignore everything in the .vscode directory except for specific files
 .vscode/*
 !.vscode/settings.json
 !.vscode/tasks.json

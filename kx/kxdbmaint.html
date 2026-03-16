@@ -30,15 +30,405 @@
     <nav>
         <a href="../index.html">Back to home page</a>
         <ul>
-            <li><a href="enumeration">Enumeration</a></li>
+            <li><a href="#enumeration">Enumeration</a></li>
+            <li><a href="#foreign">Foreign Keys</a></li>
+            <li><a href="#compression">Compression</a></li>
+            <li><a href="#db">Database</a>
+                <ul>
+                    <li><a href="#overview">Overview</a></li>
+                    <li><a href="#flat">Flat tables</a></li>
+                    <li><a href="#splayed">Splayed tables</a></li>
+                    <li><a href="#partitioned">Partitioned tables</a></li>
+                    <li><a href="#segmented">Segmented database</a></li>
+                </ul>
+            </li>
         </ul>
     </nav>
 
 
     <div id="enumeration">
         <h2>Enumeration</h2>
+        Enumeration is a way to encode symbols so that they take less storage space. <br>
+        For example, given this list of symbols <code>`AAPL`GOOG`AAPL`MSFT`GOOG`AAPL`GOOG`AAPL`MSFT`GOOG</code><br>
+        The actual domain is just three symbols <code>`AAPL`GOOG`MSFT</code><br>
+        Without enumeration, each symbol takes 8 bytes, and the list above will take 80 bytes. <br>
+        With enumeration, we can encode the list as a list of numeric values. Note that 1 byte can represent 256
+        different values, which is far more than what we need to encode 3 symbols, so we can represent everything in our
+        domain with only 1 byte. The list will only take 10 bytes with enumeration. <br>
+        <br>
+        There are two ways to create enumeration in kdb:
+        <ul>
+            <li>Enumerate <code>$</code> <br>
+                With this method, all values to be enumerated must be in the domain. If there is an unseen new value,
+                the enumeration will fail with a cast error. Therefore, it is best to use this method when the domain is
+                fixed. <br>
+                This method does not preserve attributes on the list.
+            </li>
+            <li>Enumerate extend <code>?</code><br>
+                The difference is that with this method, if we encounter a new value, it will append to the domain
+                automatically. <br>
+                This method preserves attributes on the list.
+            </li>
+        </ul>
+
+        To illustrate the two methods:
+        <pre><code>
+            q) stocks:`AAPL`GOOG`AAPL`MSFT`GOOG`AAPL`GOOG`AAPL`MSFT`GOOG
+            q) domainStocks: distinct stocks
+            q) show enumStocks:domainStocks$stocks
+            `s$`AAPL`GOOG`AAPL`MSFT`GOOG`AAPL`GOOG`AAPL`MSFT`GOOG
+
+            // alternatively, use ? and provide an empty domain, then let it update itself
+            // the backtick before the domain ` is essential
+            q) `createDomain?`stocks
+            `s$`AAPL`GOOG`AAPL`MSFT`GOOG`AAPL`GOOG`AAPL`MSFT`GOOG
+            q) createDomain
+            `AAPL`GOOG`MSFT
+        </code></pre>
+        Several things to note here:
+        <ul>
+            <li>The syntax is always <code>domain$list</code> or <code>domain?list</code> for both methods.</li>
+            <li><code>domainStocks</code><br>
+                This is the domain of the list. Usually we don't want the domain to have duplicates. <br>
+                If you update the domain, your enumerated list will also be updated.
+            </li>
+            <li><code>enumStocks</code><br>
+                The <code>`s$</code> in the output means the list is enumerated. <br>
+                Essentially, an enumerated list is also a list of symbols, so anything you can apply to a regular list
+                of symbols also applies here.
+            </li>
+        </ul>
+
+        Two ways to unenumerate a list: <code>get</code> or <code>value</code>
+        <pre><code>
+            q) enumStocks
+            `s$`AAPL`GOOG`AAPL`MSFT`GOOG`AAPL`GOOG`AAPL`MSFT`GOOG
+            q) unenumeratedStocks: get enumStocks
+            q) unenumeratedStocks2: value enumStocks
+        </code></pre>
+
+        Advanced enumeration: <br>
+        The sym file in a database is essentially all symbols enumerated (not just from sym column, but all symbol
+        columns). There are helper functions in the <code>.Q</code> namespace to deal with this file, such as
+        <code>.Q.en</code>.
     </div>
 
+    <div id="foreign">
+        <h2>Foreign Keys</h2>
+        The idea is similar to relational databases where you have foreign keys to reference primary keys in other
+        tables. <br>
+        Say you have two tables <code>trades</code> and <code>sector</code>, with their <code>meta</code> look like
+        this:
+        <pre><code>
+            q) meta trades
+            c     | t f       a
+            -------------------
+            sym   | s sector
+            price | f
+            size  | f
+
+            q) meta sector
+            c     | t f a
+            -------------------
+            symb  | s
+            sector| s
+        </code></pre>
+        Here in <code>trades</code> there is a foreign key that links to <code>sector</code>. The <code>sector</code>
+        table is keyed on <code>symb</code>. <br>
+        For every <code>sym</code> in <code>trades</code>, it must appear in the <code>symb</code> column in
+        <code>sector</code>. <br>
+        If you upsert a record to <code>trades</code> with a sym that is unknown in <code>sector</code>, you will get an
+        error. <br>
+        Once you set it up correctly, you will be able to directly query the <code>sector</code> column from
+        <code>trades</code> without having to join with the <code>sector</code> table. <br>
+        e.g. <code>select from trades where sym.sector=`tech</code>
+    </div>
+
+    <div id="compression">
+        <h2>Compression</h2>
+        Tables are save compressed to reduce space on disk. <br>
+        Three keywords here:
+        <ul>
+            <li>tables: compression only works on tables, txt files etc are not affected</li>
+            <li>save: compression only affects save, you read the tables the same way as if they are uncompressed</li>
+            <li>disk: compression only works on disk, in memory tables are uncompressed</li>
+        </ul>
+
+        Two ways to do compression in kdb:
+        <ul>
+            <li>First way is to save data uncompressed to disk first, then compress it using <code>-19!</code><br>
+                <code>-19!(`:2020.01.01/trade; `:2020.01.01/trade_compressed; 16; 1; 0)</code> <br>
+                In this example, we already have an uncompressed table on disk at <code>`:2020.01.01/trade</code>. We
+                want to compress it and save the compressed version to <code>`:2020.01.01/trade_compressed</code>. <br>
+                The other parameters are explained later.
+            </li>
+            <li>Second way is to directly save it compressed. <br>
+                The way to do this is to configure compression for the entire database, such that whenever save happens
+                it automatically compresses the data. This is done through setting <code>.z.zd</code> <br>
+                <code>.z.zd: 17 2 6</code> <br>
+                Then when you save a table from memory, compression happens automatically.
+                <code>`:2020.01.01/trade_compressed set trade</code> <br>
+                You can remove the setting by setting everything to 0. <br>
+                <code>.z.zd: 3#0</code>
+            </li>
+        </ul>
+
+        What do the integers in <code>-19!</code> and <code>.z.zd</code> mean?
+        <ul>
+            <li>The first integer is block size. <br>
+                The algorithm looks at a block of data and compresses it.
+                This paramter specifies how large that block is, and it's usually a value between 12 and 20. <br>
+                The larger this value, the smaller the compressed file, the slower the compression process.
+            </li>
+            <li>The second integer is compression algorithm. <br>
+                For example, 1 means q IPC, 2 means gzip.
+            </li>
+            <li>The third integer is compression level. <br>
+                For each compression algorithm you set in the second parameter, you can specify different compression
+                level. See here <a
+                    href="https://code.kx.com/q/kb/file-compression/#compression-parameters">https://code.kx.com/q/kb/file-compression/#compression-parameters</a>
+            </li>
+        </ul>
+    </div>
+
+    <div id="db">
+        <h2>Database</h2>
+        <pre><code>
+            // taken from https://code.kx.com/q/database/segment/ with some minor edits
+            DISK 0             DISK 1                    DISK 2  
+            db                 db                        db             
+            ├── sym            ├── sym                   ├── sym
+            └── par.txt        ├── 2020.10.03            ├── 2020.10.04                         
+                               │   ├── quotes            │   ├── quotes                         
+                               │   │   ├── .d            │   │   ├── .d
+                               │   │   ├── sym           │   │   ├── sym                          
+                               │   │   ├── price         │   │   ├── price                            
+                               │   │   └── time          │   │   └── time                           
+                               │   └── trades            │   └── trades                         
+                               │       ├── .d            │       ├── .d
+                               │       ├── sym           │       ├── sym                          
+                               │       ├── price         │       ├── price                            
+                               │       ├── time          │       ├── time                           
+                               │       └── vol           │       └── vol                          
+                               ├── 2020.10.05            ├── 2020.10.06                         
+                               │   ├── quotes            │   ├── quotes      
+        </code></pre>
+        <h3 id="overview">Overview</h3>
+        The image above demonstrates kdb architecture. <br>
+        If you look at the entire structure, it is a segmented database, suitable for scalability and parallel access.
+        <br>
+        If you only look at Disk 1, it is a partitioned dtabase, suitable for more than 100 million rows, or steadily
+        growing data. But if the database grows large enough, since all partitions share I/O, it can become a
+        bottleneck, and is better to use a segmented database. <br>
+        If you only look at one table such as <code>quotes</code>, it is a splayed table, stores up to 100 million rows.
+        <br>
+        The smallest unit is a flat table, which stores up to a few million rows. <br><br>
+
+        Some important files you need to pay attention to:
+        <ul>
+            <li><code>par.txt</code> - used for segmented database, contains location of each partition <br>
+                If you read this txt file, you will see something like this: <br>
+                /disk1/db1 <br>
+                /disk2/db2
+            </li>
+            <li><code>sym</code> this is essentially the domain of all symbols to be enumerated. It appears at two
+                levels
+                <ul>
+                    <li>at the database level, it contains the list of all symbols used in the database</li>
+                    <li>at the table level, it contains the list of all symbols used in that table</li>
+                </ul>
+            </li>
+            <li><code>.d</code> - data file, contains the actual data</li>
+        </ul>
+
+        <h3 id="flat">Flat tables</h3>
+        For flat tables, see <a href="./kxipc.html#fileio">here</a>.
+
+        <h3 id="splayed">Splayed tables</h3>
+        <h4>Saving splayed tables</h4>
+        Saving a splayed table without symbols is just very slightly different from saving a flat table.
+        <pre><code>
+            // just make sure the path ends with a slash
+            q) `:db/tbl/ set tbl
+        </code></pre>
+        But if the table contains symbols, we need to enumerate, otherwise there will be a type error. <br>
+        Two ways to do it:
+        <pre><code>
+            q) `:db/tbl/ set .Q.en[`:db/; tbl]
+            q) `:db/tbl/ set .Q.ens[`:db/; tbl; symFile]
+        </code></pre>
+        The only difference is that <code>.Q.ens</code> let you use a custom symbol file instead of the default one
+        located at the root level of the database.
+
+        <h4>Loading splayed tables</h4>
+        Two ways to load splayed tables: either use <code>get</code> or just <code>\l</code> the table. <br>
+        What's happening under the hood isn't really "loading" the data into memory, but "mapping" the data on disk into
+        memory, meaning we only loaded in the "structure" of the table and where to find the data on disk.
+        <pre><code>
+            q) tbl: get `:db/tbl
+            q) \l db/tbl
+        </code></pre>
+
+        <h4>Querying splayed tables</h4>
+        If you only want to select or sort the table, you don't even have to load it. You can directly operate on the
+        splayed table as if it is in memory. But you won't be able to exec or update it.
+        <pre><code>
+            q) select from `:db/tbl where col1=1        // this is okay
+            q) delete col2 from `:db/tbl                // this will error
+        </code></pre>
+
+        <h4>Updating splayed tables</h4>
+        To update a splayed table, you need to consider three things:
+        <ul>
+            <li>the actual update similar to what you'd do for in-memory tables, like <code>upsert</code> or
+                <code>delete</code>
+            </li>
+            <li>enumeration if you touch any symbols</li>
+            <li>fixing the .d file if you touch any columns</li>
+        </ul>
+        Here are some examples:
+        <pre><code>
+            // only update rows but with symbols
+            q) `:db/tbl/ upsert .Q.en[`:db/tbl;]([]sym:`AAPL`GOOG;col1:100 200)
+            
+            // add a new column
+            q) `:db/tbl/newCol set 100 200 300                  // after this step, you won't be able to see the column yet
+            q) `:db/tbl/.d set get[`:db/tbl/.d],`newCol         // now you can see the column
+            // delete a column
+            q) system "rm db/tbl/newCol"                        // again, after this step, it's not done yet
+            q) `:db/tbl/.d set get[`:db/tbl/.d] except `newCol  // now it's done
+        </code></pre>
+
+        <h3 id="partitioned">Partitioned tables</h3>
+        A partitioned database is essentially a collection of splayed tables. <br>
+        They can be partitioend by dates, or other stuff like months. But one database can only be partitioned by one
+        thing.
+
+        <h4>Saving partitioned tables</h4>
+        Similar to what we do with splayed tables, but requires one extra step to find the actual path based on the
+        date.
+        <pre><code>
+            q) enumTable: .Q.en[`:db/; tbl]
+            q) dt: first exec distinct date from tbl            // e.g, 2020.01.01
+            q) path: ` sv `:db/,(`$string dt),`tbl`             // get the path `:db/2020.01.01/tbl/
+            q) path set select from enumTable where date=dt
+        </code></pre>
+        Above only saves one date. To partition the entire table, you can do something like this:
+        <pre><code>
+            saveTableParted:{[dir;t;tableName]
+                dts: exec distinct date from t;
+                enumTable: .Q.en[dir; t];
+                {[dir;tab;tableName;dt]
+                    toSave: select from enumTable where date=dt;
+                    path: ` sv dir, (`$string dt), tableName,`;
+                    path set toSave;
+                }[dir;enumTable;tableName] each dts
+            }
+        </code></pre>
+
+        <h4>Loading, querying and updating partitioned tables</h4>
+        Loading a partitioned table is the same as loading a splayed table. <br>
+        Similar to splayed table, you can't <code>exec</code> or update a partitioned table. <br>
+        To update a partitioned table is similar to updating a splayed table. You need to consider the same three
+        things.
+
+        <h4>Sorting large partitions</h4>
+        For large partitioned table, it might not be a good idea to sort the entire table.
+        Instead we sort one column and then use the sorted index to sort other columns.
+        <pre><code>
+            // function to perform sorting
+            indexSort:{[par;col;ordering]
+                @[hsym par; col; @[;ordering]];
+                // how to understand this function: say ordering is [2 0 3 1], and col is `quantity (20 40 10 30)
+                // @[;ordering] is a partial function waiting for a list input
+                // so @[;ordering] on `quantity is the same as (20 40 10 30)[2 0 3 1], which will return 10 20 30 40
+                // then we use @[hsym par; col; ...] to write this new value back to the column on disk
+            }
+
+            // using the function
+            q) sortedIndex: iasc get `:/db/2020.01.01/trades/time                   // get the sorted index
+            q) indexSort[`:db/2020.01.01/trades; sortedIndex] each colsOnDisk       // sort each column using the sorted index
+            q) @[partition; `time; `s#]                                             // apply sorted attribute to the time column
+        </code></pre>
+
+
+        <h4>Useful utility functions</h4>
+        There are many useful utility functions in the <code>.Q</code> namespace for working with partitioned tables.
+        <ul>
+            <li><code>.Q.chk</code> - fill missing tables</li>
+            <li><code>.Q.dpft</code> - partition a table <br>
+                This is basically what <code>saveTableParted</code> does above. <br>
+                The usage is <code>.Q.dpft[dir;date;keyCol;tableName]</code>. <br>
+                e.g. <code>.Q.dpft[`:db/;2020.01.01;`sym;`trades]</code>
+            </li>
+            <li><code>.Q.view</code> - limit how much data the user can access without specifying a where clause <br>
+                <pre><code>q) .Q.view 5 sublist date                   // only allow access to the first 5 dates
+q) select count i by date from trades       // this will only count the first 5 dates even without a where clause
+q) .Q.view[]                                // remove the setting</code></pre>
+            </li>
+            <li><code>.Q.pt</code> - returns a list of partitioned tables, e.g., trades, quotes</li>
+            <li><code>.Q.pv</code> - returns a lsit of partition values, e.g., 2020.01.01, 2020.01.02</li>
+            <li><code>.Q.pf</code> - returns the partitioned field, e.g., date</li>
+            <li><code>.Q.pd</code> - returns the path of all partitions, e.g., `:db/2020.01.01, `:db/2020.01.02</li>
+            <li><code>.Q.cn</code> - returns the count of a partitioned table for each date</li>
+            <li><code>.Q.pn</code> - similar to <code>.Q.cn</code>, but returns the count of all partitioned tables</li>
+        </ul>
+        Another very handy thing is <a href="https://github.com/KxSystems/kdb/blob/master/utils/dbmaint.md">dbmaint</a>.
+        This script is VERY, VERY useful.
+
+
+        <h3 id="segmented">Segmented database</h3>
+        Similar to what we did for partitioned tables to find correct path of a partition, we need to do one extra step
+        for segmented database to find the correct path of the disk mount.
+
+        <h4>Saving to segmented database</h4>
+        The idea is that, data should be distributed as evenly across all mounts as possible to ensure best performance.
+        <br>
+        One vanilla way to do this is to use the mod operator to determine which mount to use. <br>
+        Using an example to illustrate: if we want to find out which disk does 2016.01.01 go to, and we have 4 mounts,
+        we do <code>2016.01.01 mod 4</code>. <br>
+        This gives us 0 so this partition should go to the first mount. <br>
+        In general, to save to a segmented database, we do something like this: <br>
+        <pre><code>
+            saveSegDB:{[dt; tabName]
+                mounts: read0 `:par.txt;                                    // read all mounts
+                numMounts: count mounts;
+                allocateTo: mounts dt mod numMounts;                        // determine which mount to use, e.g., `:/disk1/db1
+                path: ` sv hsym[`$allocateTo], (`$string dt), tabName;      // construct the path, e.g., `:/disk1/db1/2016.01.01/trades/
+                path set tabName;
+            }
+        </code></pre>
+        If you update a segmented database with a new mount, you need to update <code>par.txt</code> manually.
+
+        <h4>Loading from segmented database</h4>
+        For segmented database, you almost never load the entire database into memory. <br>
+        All you need is actually just the <code>par.txt</code> file which contains the location of all partitions. <br>
+        This can be done by simply loading the root of the database, e.g., <code>\l segDBRoot</code> <br>
+        And you will be able to query the database as if it is in memory.
+
+        <h4>Useful utility functions</h4>
+        <ul>
+            <li><code>.Q.P</code> and <code>.Q.PD</code> - returns a list of segments, e.g., `:/disk1/db1, `:/disk2/db2.
+                <br>
+                This is equivalent to reading <code>par.txt</code>
+            </li>
+            <li><code>.Q.D</code> and <code>.Q.PV</code> - returns a list of partitions in each segment, e.g.,
+                2016.01.01, 2016.01.02 <br>
+                So if you want to have a dictionary of all partitions in each segment, you can do <code>.Q.P!.Q.D</code>
+                and you'll get something like: <br>
+                <pre><code>`:/disk1/db1 | 2016.01.01 2016.01.02
+`:/disk2/db2 | 2016.01.03 2016.01.04</code></pre>
+                You can also use them to get full paths of all partitions: <br>
+                <code>` sv 'raze .Q.P (,/:)'`$string .Q.D</code><br>
+                And you'll get something like <code>:/disk1/db1/2016.01.01, :/disk1/db1/2016.01.02, :/disk2/db2/2016.01.03,
+                    :/disk2/db2/2016.01.04</code>
+            </li>
+            <li><code>.Q.par</code> - returns the path of the partition <br>
+                The usage is <code>.Q.par[dir;date;table]</code>. <br>
+                e.g. <code>.Q.par[`:.;2020.01.01;`trade]</code> will return <code>`:/disk1/db1/2020.01.01</code>
+            </li>
+        </ul>
+    </div>
 </body>
 
 </html>
