@@ -56,7 +56,7 @@
         different values, which is far more than what we need to encode 3 symbols, so we can represent everything in our
         domain with only 1 byte. The list will only take 10 bytes with enumeration. <br>
         <br>
-        There are two ways to create enumeration in kdb:
+        There are two ways to create enumeration in KDB:
         <ul>
             <li>Enumerate <code>$</code> <br>
                 With this method, all values to be enumerated must be in the domain. If there is an unseen new value,
@@ -154,7 +154,7 @@
             <li>disk: compression only works on disk, in memory tables are uncompressed</li>
         </ul>
 
-        Two ways to do compression in kdb:
+        Two ways to do compression in KDB:
         <ul>
             <li>First way is to save data uncompressed to disk first, then compress it using <code>-19!</code><br>
                 <code>-19!(`:2020.01.01/trade; `:2020.01.01/trade_compressed; 16; 1; 0)</code> <br>
@@ -214,7 +214,7 @@
                                │   ├── quotes            │   ├── quotes      
         </code></pre>
         <h3 id="overview">Overview</h3>
-        The image above demonstrates kdb architecture. <br>
+        The image above demonstrates KDB architecture. <br>
         If you look at the entire structure, it is a segmented database, suitable for scalability and parallel access.
         <br>
         If you only look at Disk 1, it is a partitioned dtabase, suitable for more than 100 million rows, or steadily
@@ -231,14 +231,17 @@
                 /disk1/db1 <br>
                 /disk2/db2
             </li>
-            <li><code>sym</code> this is essentially the domain of all symbols to be enumerated. It appears at two
-                levels
+            <li><code>sym</code> - this file appears at two levels, both in the form of a flat file, but serve different
+                purposes.
                 <ul>
-                    <li>at the database level, it contains the list of all symbols used in the database</li>
-                    <li>at the table level, it contains the list of all symbols used in that table</li>
+                    <li>at the database level, it contains the <a href="#enumeration">enumeration domain</a>
+                        of all the symbols (not just those in sym columns, but all columns with type symbol) in the
+                        database. </li>
+                    <li>at the table level, it is the same as any other columns in this table, stored as a flat file. It
+                        contains the actual symbols in the sym column.</li>
                 </ul>
             </li>
-            <li><code>.d</code> - data file, contains the actual data</li>
+            <li><code>.d</code> - contains a list of symbols that records the column order in each table.</li>
         </ul>
 
         <h3 id="flat">Flat tables</h3>
@@ -301,8 +304,10 @@
 
         <h3 id="partitioned">Partitioned tables</h3>
         A partitioned database is essentially a collection of splayed tables. <br>
-        They can be partitioend by dates, or other stuff like months. But one database can only be partitioned by one
-        thing.
+        They can be partitioned by dates, or other stuff like months. But one database can only be partitioned by one
+        thing. <br>
+        Once you decide how to partition it, KDB will add a virtual column corresponding to the data type you choose.
+        For example, if you choose to partition by date, it will add a virtual date column.
 
         <h4>Saving partitioned tables</h4>
         Similar to what we do with splayed tables, but requires one extra step to find the actual path based on the
@@ -373,7 +378,7 @@ q) .Q.view[]                                // remove the setting</code></pre>
             <li><code>.Q.cn</code> - returns the count of a partitioned table for each date</li>
             <li><code>.Q.pn</code> - similar to <code>.Q.cn</code>, but returns the count of all partitioned tables</li>
         </ul>
-        Another very handy thing is <a href="https://github.com/KxSystems/kdb/blob/master/utils/dbmaint.md">dbmaint</a>.
+        Another very handy thing is <a href="https://github.com/KxSystems/KDB/blob/master/utils/dbmaint.md">dbmaint</a>.
         This script is VERY, VERY useful.
 
 

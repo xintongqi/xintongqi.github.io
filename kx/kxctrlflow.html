@@ -177,6 +177,15 @@
         The errorHandler is a function that takes one argument, which is the error message. <br>
         For example:
         <pre><code class="q">protectedSin: {[x] @[sin; x; {`errorOccurred}]}</code></pre>
+
+        <h3>Extend trap</h3>
+        This is try-catch block with backtrace. <br>
+        For try-catch with <code>@</code>, the error function only takes one argument, which is the error message. <br>
+        But with extend trap <code>.Q.trp</code>, you can pass two arguments, the error message and the backtrace. <br>
+        To make the backtrace more human-readable, <code>.Q.trp</code> is usually used together with
+        <code>.Q.sbt</code>.
+        <pre><code>.Q.trp[f; `three; {2@"Error is :",x,"\nBacktrace:\n",.Q.sbt y; -1}</code></pre>
+
     </div>
 
     <div id="iterators">

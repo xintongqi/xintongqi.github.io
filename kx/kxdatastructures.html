@@ -88,7 +88,10 @@
             <li><code>=</code> and its counterparty <code><></code> don't do type checking. They only compare values.
             </li>
             <li><code>~</code> this is exact match: not only checks the value but the type as well. It treats a list as
-                a single entity.</li>
+                a single entity. <br>
+                However, <code>~</code> does not check <a href="../kx/kxtables.html#attributes">attributes</a> on lists.
+                So <code>asc[1 2 3 4]~1 2 3 4</code> returns true.
+            </li>
             <li><code>like</code> this is used for string comparison.</li>
         </ol>
     </div>
@@ -153,7 +156,7 @@
         <h4>1D lists</h4>
         Indexing can be done with or withouth the square brackets <code>[]</code>. <br>
         If index out of bound, it'll return null of the same data type as the first element in the list. <br>
-        Pay attention though, in kdb DO NOT use negative index. It doesn't work like python.
+        Pay attention though, in KDB DO NOT use negative index. It doesn't work like python.
         It'll return null instead of returning the element from the end of the list. <br>
         If you want to achieve similar effect, do this
         <pre><code>q) L[-2 + count L]</code></pre>
@@ -242,7 +245,7 @@
 
     <div id="strings">
         <h2>Strings</h2>
-        Strings are lists of characters in kdb. So anything that applies to lists also applies to strings. <br>
+        Strings are lists of characters in KDB. So anything that applies to lists also applies to strings. <br>
         Besides what applies to lists, there are some string-specific functions.
 
         <h3>Parsing and composing strings</h3>

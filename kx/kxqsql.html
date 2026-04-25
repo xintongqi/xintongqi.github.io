@@ -116,6 +116,136 @@
 
     <div id="functional">
         <h2>Functional form</h2>
+        <ul>
+            <li>What is functional form? <br>
+                A list of operations in the order of being implemented.</li>
+            <li>Why functional form?
+                <ul>
+                    <li>functional form allows operations that are not supported otherwise, e.g., with regular
+                        <code>exec</code>, you can't group by; with regular <code>delete</code> you can't where. But
+                        with functional form both are possible.
+                    </li>
+                    <li>
+                        with functional form, you can tidy up the query to make it more organized, e.g., if you have a
+                        lot of aggregations, you can break the query into several smaller pieces.
+                    </li>
+                    <li>
+                        functional form allows dynamic query generation. You can pass variables and results calculated
+                        from other statements
+                    </li>
+                </ul>
+            </li>
+            <li>How to get the functional form? Use <code>parse</code><br>
+                <pre><code>q) parse "2*4-2%-2#1 2 3 4 5"
+*
+2
+(-;4;(%;2;(#;-2;1 2 3 4 5)))</code></pre>
+            </li>
+            <li>How to evaluate a functional form? <br>
+                Use either <code>eval</code> or <code>value</code>.
+            </li>
+        </ul>
+
+        <h3>Functional q-sql</h3>
+        For functional queries, the general form is
+        <pre><code>queryFunc[table; whereClause; byClause; returnClause]</code></pre>
+        In the following sections, we will learn how to use <code>parse</code> to write functional forms.
+
+        <h4>queryFunc</h4>
+        <code>queryFunc</code> is always <code>?</code> for <code>select</code>, <code>exec</code>, and <code>!</code>
+        for <code>update</code>, <code>delete</code>. <br>
+        Let's start with a simplest query and see what the <code>parse</code> output looks like.
+        <pre><code>
+            q) parse"select from trade"
+            ?                           // queryFunc
+            `trade                      // table
+            ()                          // whereClause
+            0b                          // byClause
+            ()                          // returnClause
+        </code></pre>
+        When you <code>parse</code>, the five elements of a functional query will be listed one by one. However,
+        sometimes you need to modify the output a little. We will show some common modifications in sections below.
+
+        <h4>whereClause</h4>
+        <code>whereClause</code> is a list of functional expressions. If it's a single statement, you need to
+        <code>enlist</code>. <br>
+        Example of writing the where clause from <code>parse</code>:
+        <pre><code>
+            q) parse"select from trade where sym=`JPM, size>20"
+            ?
+            `trade
+            ,((=;`sym;,`JPM);(>;`size;20))      // whereClause to be translated
+            0b
+            ()
+        </code></pre>
+        This <code>where</code> output cannot be used directly. You need to translate it, two principles (applicable to
+        all following sections on other components of the functional query):
+        <ul>
+            <li>ignore the first comma at the very beginning</li>
+            <li>for other commas, use <code>enlist</code>, such as the one before <code>`JPM</code></li>
+        </ul>
+        Thus the <code>whereClause</code> for this statement is actually
+        <code>((=;`sym; enlist `JPM);(>;`size;20))</code>. <br><br>
+
+        For <code>exec</code> only, you need to use <code>whereClause</code> together with <code>returnClause</code>,
+        otherwise it will only return the last record that satisfy the where clause. <br>
+        If the above example is changed to <code>exec</code>, you need a <code>returnClause</code> that is a dictionary
+        <code>x!x:cols[trade]</code>.
+
+        <h4>byClause</h4>
+        <code>byClause</code> is a dictionary. Usually you don't need to translate the output from <code>parse</code>.
+        <br>
+        If you <code>select by sym, exchange...</code>, the <code>byClause</code> in it will just be
+        <code>`sym`exchange!`sym`exchange</code>. <br>
+        But if there is <code>xbar</code> in the <code>by</code>, then you need to translate it.
+        <pre><code>
+            q)parse"select by twoHour:0D02:00:00 xbar time from trade"
+            ?
+            `trade
+            ()
+            (,`twoHour)!,(k){$[9h=t:abs[@x];x*r+y=x*1+r:(y:9h$y)div x;x*y div x:$[16h=t;"j"$x;x]]};0D02:00:00.000000000;`time)
+            ()
+        </code></pre>
+        The way to translate is to put it into a dictionary like this
+        <code>enlist[`twoHour]!enlist (xbar; 0D02:00:00; `time)</code> <br><br>
+
+        In addtion, with functional by, you can use group by on <code>exec</code>. It will just behave as if it were
+        <code>select</code>. You can pass a list instead of dictionary as <code>byClause</code> if it's
+        <code>exec</code> too.
+
+        <h4>returnClause</h4>
+        <code>returnClause</code> can be a list or a dictionary, and depending on what <code>queryFunc</code> you're
+        using, it means different things.
+        <ul>
+            <li>for <code>select</code> and <code>exec</code>, it can be a list or a dictionary. It will return only
+                those columns you ask to return. We usually use it for aggregation functions.
+                <pre><code>select open:first price, high: max price from trade</code></pre>
+                The <code>returnClause</code> for the functional form of this query will be
+                <pre><code>`open`high!((first:;`price);(max;`price))    // first will show up as * in parse output</code></pre>
+            </li>
+            <li>for <code>update</code>, it can be a list or a dictionary. It will return all columns, with the columns
+                in <code>returnClause</code> updated.
+                <pre><code>update size+3 from trade</code></pre>
+                The <code>returnClause</code> for the functional form of this query will be
+                <pre><code>(enlist `size)!enlist (+;`size;3)</code></pre>
+            </li>
+            <li>for <code>delete</code>, it can only be a list. These columns will be deleted.
+                <pre><code>delete size from trade</code></pre>
+                The <code>returnClause</code> for the functional form of this query will be
+                <pre><code>enlist `price</code></pre>
+            </li>
+        </ul>
+
+        <h4>optional arguments</h4>
+        For <code>select</code> statement, you can pass two addtional arguments.
+        <pre><code>?[table; whereClause; byClause; returnClause; windowSize; indexSort]</code></pre>
+        <code>windowSize</code> specifies the rows to be returned. <br>
+        For example, 2 means the first two rows, -2 means the last two rows, a list 2 2 means start at row index=2 and
+        return 2 rows (so the third and fourth row). <br><br>
+        <code>indexSort</code> can only be used when <code>windowSize</code> is specified. <br>
+        If you want to return all rows, you can set <code>windowSize:0W</code> but it has to be there. <br>
+        This argument specifies how you'd sort the output, e.g., <code>(idesc; `price)</code> means sort in descending
+        order then return indices.
 
     </div>
 
@@ -123,7 +253,7 @@
         <h2>Performance hacks</h2>
         <h3>where</h3>
         When writing a <code>where</code> clause, it is always more efficient to put a date filter first, and then
-        filter on the other columns. This is due to the fact that kdb partitions data by date. <br>
+        filter on the other columns. This is due to the fact that KDB partitions data by date. <br>
         In general, the first where clause should be the most restrictive, returning the smallest set of records.
     </div>
 

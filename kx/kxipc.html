@@ -39,14 +39,15 @@
         <h2>File I/O</h2>
         <h3>Console I/O</h3>
         <pre><code>
-            // use negative file handle values for asynchronous write
             0 "this goes to console"
             1 "this goes to stdout"
             2 "this goes to stderr"
         </code></pre>
+        If you use negative handlers, it means asynchronous write. This will add new line characters to new lines. <br>
+        To write a file to console I/O, do something like <code>\1 txt_for_stdout.txt</code>
 
         <h3>File paths</h3>
-        File paths in kdb start with <code>`:</code>. <br>
+        File paths in KDB start with <code>`:</code>. <br>
         You can use <code>hsym</code> to turn a symbol/string into a file path, like this:
         <code>hsym "my/file/path</code>. <br>
         You can use <code>sv</code> to construct file paths from a list of folders, like this:
@@ -54,17 +55,17 @@
         To list all files under a path, do this <code>key `:.</code>
 
         <h3>File I/O</h3>
-        <h4>kdb files</h4>
+        <h4>KDB files</h4>
         <pre><code>
-            // write to kdb file
+            // write to KDB file
             `:filepath set tbl
-            // read from kdb file
+            // read from KDB file
             get `:filepath
         </code></pre>
-        If this kdb file is a flat table, you will be able to edit it directly on disk using qsql. <br>
+        If this KDB file is a flat table, you will be able to edit it directly on disk using qsql. <br>
         For example, something like <code>select from `:filepath where sym=`AAPL</code>
 
-        <h4>txt files</h4>
+        <h4>TXT files</h4>
         <pre><code>
             // write to txt
             fileHandle: hopen `:tbl.txt
@@ -77,7 +78,7 @@
             read0 `:tbl.txt
         </code></pre>
 
-        <h4>csv files</h4>
+        <h4>CSV files</h4>
         <pre><code>
             // write to csv
             save `:tbl.csv
@@ -88,7 +89,7 @@
         Type is a string that specifies the data type of each column, SJF here means symbol, long, float. <br>
         Type must be provided.
 
-        <h4>json files</h4>
+        <h4>JSON files</h4>
         <pre><code>
             // write to json is the same as csv
             save `:tbl.json
@@ -97,7 +98,7 @@
         </code></pre>
 
         <h3>Summary</h3>
-        In kdb, there are actually several pairs of I/O.
+        In KDB, there are actually several pairs of I/O.
         <ol>
             <li>High level abstraction: <code>save</code> and <code>load</code> <br>
                 This pair can deal with almost all file formats, but they are less flexible. For example, you can't
@@ -134,16 +135,71 @@ q)"c"$read1`:test.txt                   // convert from bytes to char
     <div id="ipc">
         <h2>IPC</h2>
         <h3>Basic client and server</h3>
+        Sync flush: the server will receive stuff you send one by one
         <pre><code>
             // on the server side
-            h:hopen `::portnumber
+            q) h:hopen `::portnumber
             // on the client side
-            h:hopen `:localhost:portnumber
-            result:h("select from tablename where condition") // query some data
-            hclose h
+            q) h:hopen `:localhost:portnumber
+            q) result:h("select from tablename where condition") // query some data
+            q) hclose h
+        </code></pre>
+
+        Async flush: the server will receive all the stuff you send
+        <pre><code>
+            q) neg[h][]     // this blocks the client until it receives something from the server
+            // alternatively
+            q) neg[h](::)   // doesn't block client; client can send h "" to ask the server for confirmation
         </code></pre>
 
         <h3>Advanced IPC using .z namespace</h3>
+        On the client side, you can't do much except those mentioned above. <br>
+        But on the server side, .z namespace can help you achieve a lot more functionalities.
+
+        <h4>talk to client process</h4>
+        You can check the ip address and the user of the calling process using <code>.z.a</code> and <code>.z.u</code>.
+        <br>
+        To talk to the client, you can open a handle to it using <code>.z.w</code>, and with this handle, you can send
+        messages back to the calling process, like how you send messages the other way around using <code>h</code>.
+        <br><br>
+
+        These three functions are defined by KDB, you don't need to define their behaviors. <br>
+        In the following sections, the functions act as event handlers. You need to define their behaviors when certain
+        events happen. <br>
+        You can reset the behaviors of those event handlers using <code>\x</code> such as <code>\x .z.pw</code>
+
+        <h4>Set up permissions</h4>
+        <code>.z.pw</code> is triggered when a client process tries to establish a new connection with the server. <br>
+        A common pattern to use permissions is:
+        <pre><code>
+            // on the server side, define .z.pw
+            q) .z.pw:{[myun; mypw] 1b}
+            // on the client side, connect with username and password
+            q) h:hopen `:host:port:myun:mypw
+        </code></pre>
+        Or you can add username and password pairs to a table.
+
+        <h4>Monitor current connections</h4>
+        <code>.z.po</code> is triggered when a new connection is open. <br>
+        <code>.z.pc</code> is triggered when a connection is closed. <br>
+        Both of them by default take one argument, and you can define them like so:
+        <pre><code>
+            q) .z.po:{0N!"Connection open on ", string[x]}
+            q) .z.pc:{0N!"Connection closed on ", string[x]}
+        </code></pre>
+        Again, you can define the functions to add/remove an entry to a table of active connections.
+
+        <h4>Message handlers</h4>
+        <code>.z.pg</code> is triggered when server receives a synchronous message from the client. <br>
+        <code>.z.ps</code> is triggered when server receives an asynchronous message from the client. <br>
+        <code>.z.ph</code> is the http alternative for <code>.z.pg</code> and <code>.z.ps</code>. <br>
+        One usecase is to decide who has permission to run which function.
+        <pre><code>
+            q) .z.pg{[query]
+                class: .perm.users[.z.u][`class];
+                $[class~`superuser; value query; \"Permission denied\"]
+            }
+        </code></pre>
     </div>
 
 </body>

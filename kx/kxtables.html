@@ -159,7 +159,7 @@
             q) sortedList,:6    // modify in place
         </code></pre>
         You can think of the syntax as <code>+=</code> in python. <br>
-        By default, operations in kdb like <code>upsert</code> and <code>insert</code> preserve this attribute.
+        By default, operations in KDB like <code>upsert</code> and <code>insert</code> preserve this attribute.
 
         <h3>Unique</h3>
         This is essentially a dictionary. <br>
@@ -173,7 +173,7 @@
         Under the hood something like this is happening:
         <pre><code>
             q) `p#`A`A`B`C`C`C
-            // just an idea of what's going on, not really how kdb implements it
+            // just an idea of what's going on, not really how KDB implements it
             `A (starts at 0, length 2)
             `B (starts at 2, length 1)
             `C (starts at 3, length 3)

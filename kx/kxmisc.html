@@ -24,7 +24,7 @@
 
 <body>
     <header>
-        <h1>Namespace <br> and Scripting</h1>
+        <h1>Miscellaneous</h1>
     </header>
 
     <nav>
@@ -32,6 +32,7 @@
         <ul>
             <li><a href="#namespace">Namespace</a></li>
             <li><a href="#scripting">Scripting</a></li>
+            <li><a href="#debugging">Debugging</a></li>
         </ul>
     </nav>
 
@@ -89,11 +90,11 @@
 
     <div id="scripting">
         <h2>Scripting</h2>
-        Scripting in kdb is easy, just save your code in a q file and load it in a q session using
+        Scripting in KDB is easy, just save your code in a q file and load it in a q session using
         <code>\l filename.q</code>.
 
         <h3>Passing arguments</h3>
-        Three ways to pass arguments to a kdb script.
+        Three ways to pass arguments to a KDB script.
         First way is to pass arguments in a q session when calling the script:
         <pre><code>
             q) name:"Alice"
@@ -117,6 +118,46 @@
         <pre><code>
             \_ myscript.q       // this will hide the source code
             \l myscript.q_      // this will load the hidden script
+        </code></pre>
+    </div>
+
+    <div id="debugging">
+        <h2>Debugging</h2>
+        <h3>Breakpoints</h3>
+        There is no breakpoint in KDB q, but there are two ways you can simulate the behavior. <br>
+        Either just return the value you want to evaluate, or raise an error, and then debug in the break mode
+        <pre><code>
+            q) myFunc:{[var1; var2]
+                    // some statements
+                    var1+var2;
+                    `break; // break here
+                    // more statements
+                }
+            q) g[x;y]
+            `break
+            // now you are in the break mode, note the double parenthesis here
+            q)) var1 // you'll be able to evaluate runtime values
+            // exit the break mode with a slash \
+            // if it's a nested break mode, you can check which layer you're in by
+            q))) .z.s
+            // if you want to go up a layer, can either use single slash, or return something
+            q))) :1
+            q)) // up a layer, one less parenthesis
+        </code></pre>
+
+        <h3>Backtraces</h3>
+        Since KDB 4.0, you can use <code>.Q.bt[]</code> to dump the backtrace to stdout at any point during runtime.
+        <pre><code>
+            q) add:{x+y}
+            q) addTwo:{a: add[1;2]; b:add[3;`four]}
+            q) addTwo[]
+            `type
+            q)) .Q.bt[]
+            >>[2] add{x+y}
+              [1] addTwo:{a: add[1;2]; b:add[3;`four]}
+                                         ^
+              [0] addTwo[]
+                  ^
         </code></pre>
     </div>
 

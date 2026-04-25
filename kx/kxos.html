@@ -37,10 +37,163 @@
 
     <div id="parallelization">
         <h2>Parallelization</h2>
+        <h3>Timer</h3>
+        You can test how long something takes to run by using <code>\t</code>. <br>
+        For example, <code>\t do[1000000; til 100]</code><br>
+        <br>
+        You can also use a timer to set a function to run every so often.
+        <pre><code>
+            q) myVar: 0
+            q) .z.ts:{myVar+:1}     // increase myVar by 1 when timer ticks
+            q) system"t 1000"       // timer ticks every 1000 ms
+            q) system"t 0"          // stop timer
+        </code></pre>
+
+        <h3>Multithreading / Multiprocessing</h3>
+        Before we start, there are some limitations for the secondary threads in KDB:
+        <ul>
+            <li>You can't update global variables in secondary threads.</li>
+            <li>You can't use sockets in secondary threads.</li>
+            <li>For memory management, <code>.Q.w[]</code> returns only memory of the main thread, but
+                <code>.Q.gc[]</code> works for all threads.
+            </li>
+            <li>Symbols are accessible to all threads, but the optimization algorithm for symbols only work in the mean
+                thread, so in secondary threads it'll be slower to use symbols.</li>
+        </ul>
+        In KDB 4.0+, multithreading is embedded in some operators by default. They automatically decide whether to run
+        in parallel or not. <br>
+        Here we only talk about the vanilla way to do multithreading.
+
+        <h4>Allocate threads / processes</h4>
+        The first step is to allocate multiple threads. <br>
+        You can either specify the number of threads when starting the q process: <br>
+        <code>q -s 4</code> <br>
+        Or you can change it dynamically in the q session: <br>
+        <code>q) \s 2</code> <br>
+        But pay attention, if you started the session with some number of threads, later in the session you won't be
+        able to allocate more threads than you allocated upon starting the session. <br>
+        Also, if you pass a negative value, it is multiprocessing. The rest of the use cases are the same.
+        We will only talk about multithreading here.
+
+        <h4>Run in parallel</h4>
+        After allocating threads, you should be able to start multithreading. <br>
+        There are two ways to do it. Their differences are illustrated with a simple example. <br>
+        Suppose we have a list <code>1 2 3 4 5 6</code>, and we want to plus one to each value in the list.
+        Suppose we have three threads.
+        <ul>
+            <li><code>peach</code> - this is parallel each. <br>
+                <code>q) {x+1} peach 1 2 3 4 5 6</code><br>
+                <code>peach</code> will allocate 1 4 to the first thread, 2 5 to the second thread, and 3 6 to the
+                third thread
+            </li>
+            <li><code>.Q.fc</code> - this is parallel cut. <br>
+                <code>q) .Q.fc[{x+1}; 1 2 3 4 5 6]</code><br>
+                <code>.Q.fc</code> will allocate 1 2 to the first thread, 3 4 to the second thread, and 5 6 to the
+                third thread.
+            </li>
+        </ul>
+
+        <figure>
+            <img src="../images/kxos_parallel.png" alt="peach vs .Q.fc">
+            <figcaption>peach vs .Q.fc</figcaption>
+        </figure>
+
+        Does this distinction make a difference? The answer is yes. <br>
+        We're only looking at a very simple function in the above example, adding 1 to 1 and 10000 takes the same
+        amount
+        of time. <br>
+        But imagine if the function runtime is input dependent, for example, a function that does a binary search on
+        a
+        sorted list. <br>
+        If the list is short, the search will be fast, but if the list is long, the search will be slow. <br>
+        In this case, we want to make sure the workload is balanced, so that no thread is idle while others are
+        still
+        working. <br>
+        Say we still have three threads and six inputs. <br>
+        If we use <code>peach</code>, we want to make sure the 1st and 4th input together takes about the same
+        amount of
+        time as the 2nd and 5th input, and the 3rd and 6th input. <br>
+        If we use <code>.Q.fc</code>, we want to make sure the 1st and 2nd input together takes about the same
+        amount of
+        time as the 3rd and 4th input, and the 5th and 6th input.
+
+        <h4>Examples of using multithreading</h4>
+        Run the same query across multiple partitions.
+        <pre><code>
+            q) raze (select from trade where date=x) peach .Q.pv
+            // you need to use raze to flatten the result
+        </code></pre>
+
+        Run dbmaint <code>addcol</code> in parallel.
+        <pre><code>
+            addColPeach:{[dir;tbl;colName;defaultVal]
+                add1col[;colName; enum[dir; defaultVal]] peach allPaths[dir; tbl];
+            }
+        </code></pre>
+
+        Parallel file I/O
+        <pre><code>
+            // convert tbl to csv, then parallel save in 5 chunks into 5 files
+            {(hsym `$"dir/file",string 1+x) 0: csv 0: tbl[x]} peach til 5
+            // load the 5 csv (suppose data types are FSTFIC) and raze them together
+            raze {1_ (\"FSTFIC\";csv) 0:  (hsym `$"dir/file",string 1+x)} peach til 5
+        </code></pre>
     </div>
 
     <div id="memory">
         <h2>Memory management</h2>
+        KDB uses buddy memory allocation, which means memory is allocated in blocks of powers of 2.
+
+        <h3>Check memory usage</h3>
+        <h4>Quick approximation for simple objects</h4>
+        For simple objects, you can inspect memory using <code>-22!</code>, which returns memory usage in bytes. <br>
+        For example, <code>-22!([]a:100?500f)</code> wil return 831 = 100*8 bytes per float + some small overheads.
+        You can round the result to the nearest power of 2 to make it more accurate (becoz of the buddy memory
+        allocation thing) <br>
+        <code>2 xexp ceiling 2 xlog -22!([]a:100?500f)</code> <br>
+        But keep in mind, this only works on simple objects, and is merely an approximation.
+
+        <h4>Identify real memory usage for a session (single thread)</h4>
+        <code>\w</code> can be used for this purpose. It returns a group of six values.
+        <ul>
+            <li>used: this is memory in use</li>
+            <li>heap: memory reserved from the os for this process</li>
+            <li>peak: largest heap size for a process so far</li>
+            <li>wmax: user defined heap limit using the flag -w when starting up process</li>
+            <li>mmap: memory mapped from disk (not RAM)</li>
+            <li>mphy: system physical memory available on the machine</li>
+        </ul>
+
+        <code>\w 0</code> can be used to check symbo realted memory usage. It returns two values.
+        <ul>
+            <li>syms: number of distinct symbols in a process</li>
+            <li>symw: memory footprint of internal symbol map</li>
+        </ul>
+
+        <code>.Q.w</code> is another way to inspect. It will return all eight values above.
+
+        <h4>Garbage collection</h4>
+        Two types of garbage collection in KDB: deferred and immediate.
+        <ul>
+            <li>deferred (<code>\g 0</code>): returns memory when <code>.Q.gc</code> is called or when memory allocation
+                fails</li>
+            <li>immediate (<code>\g 1</code>): no need to call <code>.Q.gc</code>, memory returned once there is no
+                reference to it. <br>
+                You can check how many objects are referring to an object using <code>-16!myVar</code>
+            </li>
+        </ul>
+        Deferred is usually more efficient, but immediate is less hassel because it checks automatically.
+
+        <h4>Good practices</h4>
+        One good practice to prevent memory shortage is to limit how much data can be loaded by the user. <br>
+        Suppose the user queries <code>select from trades</code> without a <code>where</code> statement on
+        <code>date</code>, they could blow up memory usage. <br>
+        You can configure this with <code>.Q.view</code> like so <br>
+        <code>q) .Q.view 5 sublist date</code> <br>
+        This way even people do <code>select</code> without <code>where</code>, they will be limited to load 5 day's
+        data into memory. <br>
+        To remove this setting, just do <code>.Q.view[]</code> without argument.
+
     </div>
 
 </body>
