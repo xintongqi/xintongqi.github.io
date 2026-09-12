@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description"
+        content="Basic MATLAB guides with examples for arrays, indexing, scripts, functions, and plotting.">
+    <title>MATLAB</title>
+    <link rel="stylesheet" href="../styles/main.css">
+    <link rel="stylesheet" href="../styles/print.css" media="print">
+    <link rel="stylesheet"
+        href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.7.0/build/styles/default.min.css">
+    <script defer src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.7.0/build/highlight.min.js"></script>
+    <script defer
+        src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.7.0/build/languages/matlab.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            if (window.hljs) hljs.highlightAll();
+        });
+    </script>
+    <style>
+        pre {
+            overflow-x: auto;
+        }
+
+        @media screen and (max-width: 700px) {
+
+            header,
+            nav {
+                position: static;
+                width: auto;
+                height: auto;
+                padding: 10px;
+                float: none;
+            }
+
+            div {
+                float: none;
+                width: auto;
+                padding: 0 10px;
+            }
+
+            nav li {
+                padding: 4px 0;
+            }
+        }
+
+        @media print {
+            header {
+                position: static;
+                width: auto;
+                padding: 0;
+            }
+
+            pre {
+                width: auto;
+                white-space: pre-wrap;
+                overflow-wrap: anywhere;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <h1>MATLAB</h1>
+    </header>
+    <nav aria-label="Guide sections">
+        <a href="../index.html">Back to home page</a>
+        <ul>
+            <li><a href="#basics">Basics</a></li>
+            <li><a href="#arrays">Arrays and Matrices</a></li>
+            <li><a href="#indexing">Indexing</a></li>
+            <li><a href="#operations">Operations</a></li>
+            <li><a href="#scripts">Scripts and Functions</a></li>
+            <li><a href="#control">Conditions and Loops</a></li>
+            <li><a href="#plotting">Plotting</a></li>
+            <li><a href="#files">Saving and Loading</a></li>
+            <li><a href="#tips">Common Gotchas</a></li>
+            <li><a href="#references">References</a></li>
+        </ul>
+    </nav>
+
+    <div id="basics">
+        <h2>Basics</h2>
+        <p>Some quick MATLAB notes, starting with the basics. Run commands directly in the Command Window,
+            or save them in a <code>.m</code> script to run again later.</p>
+        <pre><code class="language-matlab">x = 5;                    % 'double' (default numeric type)
+name = "Amy";             % string scalar
+letters = 'Amy';          % character vector
+isReady = true;           % logical value
+class(x)                  % check type
+fprintf('x = %.2f\n', x)  % formatted output: x = 5.00
+
+who                       % list workspace variables
+whos                      % also show sizes and types
+clear x                   % remove just x
+clc                       % clear the Command Window, keeping variables
+pwd                       % current folder</code></pre>
+        <p>Variable names are case-sensitive: <code>x</code> and <code>X</code> are different.
+            Use <code>...</code> at the end of a line to continue a long expression on the next line.</p>
+    </div>
+
+    <div id="arrays">
+        <h2>Arrays and Matrices</h2>
+        <p>Spaces or commas separate columns; semicolons separate rows. All rows in a matrix need the same length.</p>
+        <pre><code class="language-matlab">row = [1 2 3];                  % 1-by-3 row vector
+col = [1; 2; 3];                % 3-by-1 column vector
+A = [1 2 3; 4 5 6];             % 2-by-3 matrix
+
+steps = 0:2:10;                 % [0 2 4 6 8 10]: start:step:end
+points = linspace(0, 1, 5);     % 5 evenly spaced points, including both ends
+Z = zeros(2, 3);                % 2-by-3 zeros
+O = ones(2, 3);                 % 2-by-3 ones
+I = eye(3);                     % 3-by-3 identity matrix
+
+size(A)                         % [2 3]
+size(A, 1)                      % 2 rows
+numel(A)                        % 6 elements
+length(A)                       % 3: largest dimension, not total elements
+
+B = [A; 7 8 9];                 % append a row
+C = [A, [7; 8]];                % append a column
+reshaped = reshape(1:6, 2, 3);  % [1 3 5; 2 4 6], filled column by column</code></pre>
+    </div>
+
+    <div id="indexing">
+        <h2>Indexing</h2>
+        <p>Indices start at <strong>1</strong>. Use parentheses to select elements, <code>:</code> for a range
+            or an entire dimension, and <code>end</code> for the last index in that dimension.</p>
+        <pre><code class="language-matlab">A = [10 20 30; 40 50 60];
+A(2, 3)              % 60: row 2, column 3
+A(1, :)              % [10 20 30]: entire first row
+A(:, 2)              % [20; 50]: entire second column
+A(:, 1:2)            % first two columns (both endpoints included)
+A(end, end)          % 60
+
+% A single index traverses columns, top to bottom.
+A(3)                 % 20
+A(:)                 % [10; 40; 20; 50; 30; 60]
+
+mask = A &gt; 30;       % logical array of the same size as A
+selected = A(mask);  % [40; 50; 60]
+A(A &gt; 30) = 0;       % replace matching elements
+A(:, 2) = [];        % delete the second column</code></pre>
+    </div>
+
+    <div id="operations">
+        <h2>Operations</h2>
+        <p><code>*</code>, <code>/</code>, and <code>^</code> are matrix operations.
+            Use <code>.*</code>, <code>./</code>, and <code>.^</code> to operate on individual elements.
+            Addition and subtraction already work element by element.</p>
+        <pre><code class="language-matlab">A = [1 2; 3 4];
+B = [5 6; 7 8];
+A * B                           % matrix product: [19 22; 43 50]
+A .* B                          % element-wise product: [5 12; 21 32]
+A ^ 2                           % A * A
+A .^ 2                          % square each element: [1 4; 9 16]
+A ./ B                          % divide corresponding elements
+A + 10                          % add 10 to every element
+A.'                             % transpose without complex conjugation
+A'                              % conjugate transpose (same for real numbers)
+
+% Solve A*x = b with backslash.
+b = [5; 11];
+x = A \ b;                      % [1; 2]
+
+sum(A)                          % column sums: [4 6]
+mean(A, 2)                      % row means: [1.5; 3.5]
+sum(A(:))                       % sum of every element: 10
+[value, index] = max([3 9 4]);  % value = 9, index = 2</code></pre>
+        <p>For matrix multiplication, the inner dimensions must match. Element-wise operations need
+            compatible sizes; matching sizes are the simplest case. A row plus a column can expand into
+            a matrix, so check shapes when a result looks unexpected.</p>
+    </div>
+
+    <div id="scripts">
+        <h2>Scripts and Functions</h2>
+        <p>A script runs commands in the workspace it is called from. Save this as <code>first_plot.m</code>,
+            then type <code>first_plot</code> in the Command Window while its folder is current.</p>
+        <pre><code class="language-matlab">% first_plot.m
+x = linspace(0, 2*pi, 100);
+y = sin(x);
+plot(x, y)
+grid on</code></pre>
+        <p>A function has its own workspace and receives inputs explicitly. Save this function in
+            <code>rectangleStats.m</code>, matching the function name.
+        </p>
+        <pre><code class="language-matlab">function [area, perimeter] = rectangleStats(width, height)
+    area = width * height;
+    perimeter = 2 * (width + height);
+end</code></pre>
+        <p>Call it from the Command Window or another script. The file must be in the current folder or on the MATLAB
+            path.</p>
+        <pre><code class="language-matlab">[a, p] = rectangleStats(3, 4);  % a = 12, p = 14
+[a, ~] = rectangleStats(3, 4);  % ignore the second output
+
+% Anonymous functions are useful for short expressions.
+square = @(x) x.^2;
+square([1 2 3])                 % [1 4 9]</code></pre>
+    </div>
+
+    <div id="control">
+        <h2>Conditions and Loops</h2>
+        <p>Use <code>==</code> to compare values and <code>~=</code> for “not equal.”
+            <code>&amp;&amp;</code> and <code>||</code> short-circuit scalar logical conditions;
+            <code>&amp;</code> and <code>|</code> combine logical arrays element by element.
+        </p>
+        <pre><code class="language-matlab">score = 75;
+if score &gt;= 90
+    disp("Great")
+elseif score &gt;= 60
+    disp("Pass")
+else
+    disp("Try again")
+end
+
+values = [2 5 8];
+if any(values &gt; 7)
+    disp("At least one value is above 7")
+end
+if all(values &gt; 0)
+    disp("All values are positive")
+end
+
+squares = zeros(1, 5);  % allocate space before the loop
+for k = 1:5
+    squares(k) = k^2;
+end
+% The same calculation can be written as (1:5).^2.
+
+n = 1;
+while n &lt; 10
+    n = n * 2;
+end                     % n = 16</code></pre>
+        <p><code>break</code> exits a loop; <code>continue</code> skips to the next iteration.
+            For a matrix-wide condition, use something like <code>all(A(:) &gt; 0)</code> to get one logical value.</p>
+    </div>
+
+    <div id="plotting">
+        <h2>Plotting</h2>
+        <p>For a simple line plot, give <code>plot</code> two vectors with the same number of elements.
+            Use <code>hold on</code> to add a second curve to the same axes.</p>
+        <pre><code class="language-matlab">x = linspace(0, 2*pi, 200);
+figure
+plot(x, sin(x), 'b-', 'LineWidth', 1.5)
+hold on
+plot(x, cos(x), 'r--', 'LineWidth', 1.5)
+hold off
+xlabel('x (radians)')
+ylabel('Value')
+title('Sine and cosine')
+legend('sin(x)', 'cos(x)', 'Location', 'best')
+grid on
+
+% Run separately for a scatter plot or histogram.
+figure
+scatter([1 2 3], [2 5 4])
+figure
+histogram([1 1 2 3 3 3 4])</code></pre>
+        <p>Call <code>figure</code> to start a new figure window and <code>close</code> to close the current one.</p>
+    </div>
+
+    <div id="files">
+        <h2>Saving and Loading</h2>
+        <p>MAT-files preserve MATLAB variables. CSV files are useful for exchanging rectangular data.
+            These examples write files in the current folder and overwrite files with the same names.</p>
+        <pre><code class="language-matlab">x = 1:5;
+y = x.^2;
+save('matlab_guide_example.mat', 'x', 'y')
+loaded = load('matlab_guide_example.mat');  % load into a structure
+loaded.x                                    % access a saved variable
+
+M = [1 10; 2 20; 3 30];
+writematrix(M, 'matlab_guide_example.csv')
+M = readmatrix('matlab_guide_example.csv');
+
+% Tables give columns names and can hold different types of data.
+T = table(["Amy"; "Sam"], [90; 85], ...
+    'VariableNames', {'Name', 'Score'});
+T.Score                                     % access one column
+writetable(T, 'matlab_guide_scores.csv')
+T = readtable('matlab_guide_scores.csv');</code></pre>
+    </div>
+
+    <div id="tips">
+        <h2>Common Gotchas</h2>
+        <ul>
+            <li><code>A(0)</code> is invalid: indexing starts at 1.</li>
+            <li><code>1:3</code> includes 3. With a different step, the endpoint is included only if reached.</li>
+            <li><code>=</code> assigns; <code>==</code> compares.</li>
+            <li>Use <code>x.^2</code> when squaring each value of a vector.</li>
+            <li>A row vector and a column vector have different shapes. Check <code>size</code> when debugging.</li>
+            <li>Avoid variable or file names such as <code>sum</code>, <code>plot</code>, or <code>mean</code>;
+                they can hide built-in functions. <code>which plot -all</code> helps find name conflicts.</li>
+            <li>Scripts can depend on variables left in the workspace. Define their inputs so they also run in a fresh
+                session.</li>
+            <li>Click beside a line number in the Editor to set a breakpoint and inspect variables while paused.</li>
+        </ul>
+    </div>
+
+    <div id="references">
+        <h2>References</h2>
+        <ul>
+            <li><a href="https://www.mathworks.com/help/matlab/getting-started-with-matlab.htm">MathWorks: Get Started
+                    with MATLAB</a></li>
+            <li><a href="https://www.mathworks.com/help/matlab/language-fundamentals.html">Language Fundamentals</a>
+            </li>
+            <li><a href="https://www.mathworks.com/help/matlab/learn_matlab/array-indexing.html">Array Indexing</a></li>
+            <li><a href="https://www.mathworks.com/help/matlab/ref/plot.html">plot Documentation</a></li>
+        </ul>
+    </div>
+</body>
+
+</html>
